@@ -2,6 +2,7 @@ package com.productbot.service;
 
 import com.messanger.Event;
 import com.messanger.Messaging;
+import com.productbot.client.Platform;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,20 +16,20 @@ public class DirectionService {
 		this.postbackParser = postbackParser;
 	}
 
-	public void directEvent(Event event) {
+	public void directEvent(Event event, Platform platform) {
 		if (event.getObject().equals("page")) {
 
 			event.getEntry().forEach(entry -> {
 				if (entry.getMessaging() != null) {
-
-					directMessaging(entry.getMessaging());
+					directMessaging(entry.getMessaging(), platform);
 				}
 			});
 		}
 	}
 
-	private void directMessaging(List<Messaging> messaging) {
+	private void directMessaging(List<Messaging> messaging, Platform platform) {
 		messaging.forEach(ms -> {
+			ms.setPlatform(platform);
 
 			if (ms.getMessage() != null)
 				passMessage(ms);
@@ -42,7 +43,7 @@ public class DirectionService {
 		switch (messaging.getPostback().getPayload()) {
 
 			case "GET_STARTED_PAYLOAD":
-				postbackParser.getStarted(messaging.getSender().getId());
+				postbackParser.getStarted(messaging);
 				break;
 
 			default:
@@ -51,6 +52,6 @@ public class DirectionService {
 	}
 
 	private void passMessage(Messaging messaging) {
-		postbackParser.getStarted(messaging.getSender().getId());
+		postbackParser.getStarted(messaging);
 	}
 }

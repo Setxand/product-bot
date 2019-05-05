@@ -1,6 +1,7 @@
 package com.productbot.controller;
 
 import com.messanger.Event;
+import com.productbot.client.Platform;
 import com.productbot.service.DirectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,8 @@ public class WebhookController {
 		return challenge;
 	}
 
-	@PostMapping("/v1/webhook")
+	@PostMapping("/v1/common-webhook")
 	public void listenEntry(@RequestBody Event event) {
-		directionService.directEvent(event);
+		directionService.directEvent(event, Platform.COMMON);
 	}
 }

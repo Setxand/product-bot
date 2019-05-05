@@ -2,6 +2,7 @@ package com.productbot;
 
 import com.messanger.*;
 import com.productbot.client.MessengerClient;
+import com.productbot.client.Platform;
 import com.productbot.client.UrlProps;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -29,9 +30,11 @@ public class BotStart {
 		String SERVER_URL = urlProps.getMap().get("server");
 		Shell shell = new Shell();
 		shell.setWhiteListedDomains(Arrays.asList(SERVER_URL));
+		shell.setPlatform(Platform.COMMON);
 
 		MessengerProfileApi messengerProfileApi = new MessengerProfileApi(new GetStarted("GET_STARTED_PAYLOAD"),
 				new ArrayList<PersistentMenu>());
+		messengerProfileApi.setPlatform(Platform.COMMON);
 		PersistentMenu persistentMenu = new PersistentMenu();
 		persistentMenu.setCallToActions(Arrays.asList(new MenuItem("postback", "Menu of croissants", "MENU_PAYLOAD")
 				, new MenuItem("postback", "Navigation menu", "NAVIGATION_MENU")));

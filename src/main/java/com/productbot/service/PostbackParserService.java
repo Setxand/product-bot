@@ -1,13 +1,11 @@
 package com.productbot.service;
 
+import com.messanger.Messaging;
 import com.messanger.UserData;
 import com.productbot.client.MessengerClient;
-import com.productbot.exceprion.BotException;
 import com.productbot.model.User;
 import com.productbot.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 
 @Service
 public class PostbackParserService {
@@ -20,8 +18,9 @@ public class PostbackParserService {
 		this.userRepo = userRepo;
 	}
 
-	void getStarted(Long id) {
-		UserData userData = createUser(messengerClient.sendFacebookRequest(id), id);
+	void getStarted(Messaging messaging) {
+		Long id = messaging.getSender().getId();
+		UserData userData = createUser(messengerClient.sendFacebookRequest(id, messaging.getPlatform()), id);
 		messengerClient.helloMessage(id, userData.getFirstName());
 	}
 

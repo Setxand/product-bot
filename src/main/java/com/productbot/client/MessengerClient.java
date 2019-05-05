@@ -13,8 +13,8 @@ import java.util.ResourceBundle;
 @Component
 public class MessengerClient extends com.messanger.client.MessengerClient {
 
-	public MessengerClient(@Value("${accessTok}") String accessToken, UrlProps urlProps) {
-		super(accessToken, urlProps.getMap().get("server"), urlProps.getMap().get("webhook"),
+	public MessengerClient(UrlProps urlProps) {
+		super(urlProps.getMap().get("accessTokMap"), urlProps.getMap().get("server"), urlProps.getMap().get("webhook"),
 							urlProps.getMap().get("urlMap"));
 	}
 
