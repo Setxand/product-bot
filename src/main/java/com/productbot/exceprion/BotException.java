@@ -1,16 +1,21 @@
 package com.productbot.exceprion;
 
-import org.springframework.http.HttpStatus;
+import com.messanger.Messaging;
 
 public class BotException extends RuntimeException {
 
-	private Long id;
+	private Messaging messaging;
 
-	public BotException(Long id) {
-		this.id = id;
+	public BotException(Messaging messaging) {
+		this.messaging = messaging;
 	}
 
-	public Long getId() {
-		return id;
+	public BotException(Messaging messaging, String message) {
+		super(message);
+		this.messaging = messaging;
+	}
+
+	public Messaging getMessaging() {
+		return messaging;
 	}
 }

@@ -3,23 +3,34 @@ package com.productbot.service;
 import com.messanger.Event;
 import com.messanger.Messaging;
 import com.productbot.client.Platform;
+import com.productbot.processor.Processor;
+import com.productbot.processor.impl.CommonProcessor;
+import com.productbot.processor.impl.CurtainProcessor;
+import com.productbot.service.common.CommonPostbackParser;
+import com.productbot.service.curtain.CurtainMessageParser;
+import com.productbot.service.curtain.CurtainPostbackParser;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DirectionService {
 
-	private final PostbackParserService postbackParser;
+	private final Map<Platform, Processor> processors;
 
-	public DirectionService(PostbackParserService postbackParser) {
-		this.postbackParser = postbackParser;
+	public DirectionService(CommonPostbackParser commonPostbackParser, CurtainPostbackParser curtainPostbackParser,
+							CurtainMessageParser curtainMessageParser) {
+		this.processors = new HashMap<>();
+		this.processors.put(Platform.COMMON, new CommonProcessor(commonPostbackParser));
+		this.processors.put(Platform.CURTAIN, new CurtainProcessor(curtainPostbackParser, curtainMessageParser));
 	}
 
 	public void directEvent(Event event, Platform platform) {
 		if (event.getObject().equals("page")) {
-
 			event.getEntry().forEach(entry -> {
+
 				if (entry.getMessaging() != null) {
 					directMessaging(entry.getMessaging(), platform);
 				}
@@ -32,26 +43,10 @@ public class DirectionService {
 			ms.setPlatform(platform);
 
 			if (ms.getMessage() != null)
-				passMessage(ms);
+				processors.get(platform).passMessage(ms);
 
 			if (ms.getPostback() != null)
-				passPostBack(ms);
+				processors.get(platform).passPostback(ms);
 		});
-	}
-
-	private void passPostBack(Messaging messaging) {
-		switch (messaging.getPostback().getPayload()) {
-
-			case "GET_STARTED_PAYLOAD":
-				postbackParser.getStarted(messaging);
-				break;
-
-			default:
-				throw new RuntimeException("Internal server error");
-		}
-	}
-
-	private void passMessage(Messaging messaging) {
-		postbackParser.getStarted(messaging);
 	}
 }

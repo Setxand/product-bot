@@ -1,13 +1,9 @@
 package com.productbot.client;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.messanger.Button;
+import com.messanger.Messaging;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 @Component
@@ -19,9 +15,8 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 	}
 
 	@Override
-	public void errorMessage(Long recipient) {
-		sendSimpleMessage(ResourceBundle.getBundle("dictionary").getString("ERROR_MESSAGE"), recipient);
-
+	public void errorMessage(Messaging messaging) {
+		sendSimpleMessage(ResourceBundle.getBundle("dictionary").getString("ERROR_MESSAGE"), messaging);
 	}
 
 	@Override
@@ -29,8 +24,16 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 /////todo
 	}
 
-	public void helloMessage(Long recipient, String firstName) {
+	public void helloMessage(String userFirstName, Messaging messaging) {
 		sendSimpleMessage(String.format(ResourceBundle.getBundle("dictionary")
-								.getString("HELLO_MESSAGE"), firstName), recipient);
+													  .getString("HELLO_MESSAGE"), userFirstName), messaging);
+	}
+
+	public Button createPostbackButton(String title, String payload) {
+		Button button = new Button();
+		button.setTitle(title);
+		button.setType("postback");
+		button.setPayload(payload);
+		return button;
 	}
 }

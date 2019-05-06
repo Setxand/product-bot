@@ -13,16 +13,21 @@ public class WebhookController {
 
 	@Autowired DirectionService directionService;
 
-	@GetMapping("/v1/webhook")
-	public String verify(@RequestParam(name = "hub.verify_token") String verifyToken,
-						 @RequestParam(name = "hub.challenge") String challenge) {
+	@GetMapping({"/v1/common-webhook", "/v1/service-webhook"})
+	public String commonVerify(@RequestParam(name = "hub.verify_token") String verifyToken,
+							   @RequestParam(name = "hub.challenge") String challenge) {
 
 		if (!verifyToken.equals("VerTok")) throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 		return challenge;
 	}
 
 	@PostMapping("/v1/common-webhook")
-	public void listenEntry(@RequestBody Event event) {
+	public void commonListenEntry(@RequestBody Event event) {
 		directionService.directEvent(event, Platform.COMMON);
+	}
+
+	@PostMapping("/v1/service-webhook")
+	public void serviceListenEntry(@RequestBody Event event) {
+		directionService.directEvent(event, Platform.CURTAIN);
 	}
 }
