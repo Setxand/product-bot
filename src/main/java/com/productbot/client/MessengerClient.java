@@ -4,6 +4,7 @@ import com.messanger.Button;
 import com.messanger.Messaging;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 @Component
@@ -29,11 +30,15 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 													  .getString("HELLO_MESSAGE"), userFirstName), messaging);
 	}
 
-	public Button createPostbackButton(String title, String payload) {
+	public Button getPButton(String title, String payload) {
 		Button button = new Button();
 		button.setTitle(title);
 		button.setType("postback");
 		button.setPayload(payload);
 		return button;
+	}
+
+	public void sendPostbackButtons(Messaging messaging, String text, Button... buttons) {
+		sendButtons(Arrays.asList(buttons), text, messaging, "button", "template");
 	}
 }

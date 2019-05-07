@@ -16,5 +16,7 @@ public interface Processor {
 
 	void passMessage(Messaging messaging);
 
+	void passQuickReply(Messaging messaging);
+
 	void getStartedAction(Messaging messaging);
 }

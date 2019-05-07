@@ -1,6 +1,6 @@
 package com.productbot.service;
 
-public interface MessageParser {
+public interface MessageParser extends Parser{
 
 
 

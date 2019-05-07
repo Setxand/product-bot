@@ -9,6 +9,8 @@ import com.productbot.processor.impl.CurtainProcessor;
 import com.productbot.service.common.CommonPostbackParser;
 import com.productbot.service.curtain.CurtainMessageParser;
 import com.productbot.service.curtain.CurtainPostbackParser;
+import com.productbot.service.curtain.CurtainQuickReplyParser;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -18,13 +20,16 @@ import java.util.Map;
 @Service
 public class DirectionService {
 
+	private static final Logger log = Logger.getLogger(DirectionService.class);
 	private final Map<Platform, Processor> processors;
 
 	public DirectionService(CommonPostbackParser commonPostbackParser, CurtainPostbackParser curtainPostbackParser,
-							CurtainMessageParser curtainMessageParser) {
+							CurtainMessageParser curtainMessageParser, CurtainQuickReplyParser curtainQuickReplyParser) {
+
 		this.processors = new HashMap<>();
 		this.processors.put(Platform.COMMON, new CommonProcessor(commonPostbackParser));
-		this.processors.put(Platform.CURTAIN, new CurtainProcessor(curtainPostbackParser, curtainMessageParser));
+		this.processors.put(Platform.CURTAIN, new CurtainProcessor(curtainPostbackParser, curtainMessageParser,
+				curtainQuickReplyParser));
 	}
 
 	public void directEvent(Event event, Platform platform) {
@@ -40,10 +45,16 @@ public class DirectionService {
 
 	private void directMessaging(List<Messaging> messaging, Platform platform) {
 		messaging.forEach(ms -> {
-			ms.setPlatform(platform);
 
-			if (ms.getMessage() != null)
-				processors.get(platform).passMessage(ms);
+			ms.setPlatform(platform);
+			if (ms.getMessage() != null) {
+
+				if (ms.getMessage().getQuickReply() != null) {
+					processors.get(platform).passQuickReply(ms);
+
+				} else
+					processors.get(platform).passMessage(ms);
+			}
 
 			if (ms.getPostback() != null)
 				processors.get(platform).passPostback(ms);

@@ -3,24 +3,28 @@ package com.productbot.processor.impl;
 import com.messanger.Messaging;
 import com.productbot.exceprion.BotException;
 import com.productbot.processor.Processor;
-import com.productbot.service.Payload;
 import com.productbot.service.curtain.CurtainMessageParser;
 import com.productbot.service.curtain.CurtainPostbackParser;
+import com.productbot.service.curtain.CurtainQuickReplyParser;
+import com.productbot.utils.QuickReplyUtils;
 
 public class CurtainProcessor implements Processor {
 
 	private final CurtainPostbackParser postbackParser;
 	private final CurtainMessageParser curtainMessageParser;
+	private final CurtainQuickReplyParser curtainQuickReplyParser;
 
-	public CurtainProcessor(CurtainPostbackParser postbackParser, CurtainMessageParser curtainMessageParser) {
+	public CurtainProcessor(CurtainPostbackParser postbackParser, CurtainMessageParser curtainMessageParser,
+							CurtainQuickReplyParser curtainQuickReplyParser) {
 		this.postbackParser = postbackParser;
 		this.curtainMessageParser = curtainMessageParser;
+		this.curtainQuickReplyParser = curtainQuickReplyParser;
 	}
 
 	@Override
 	public void passPostback(Messaging messaging) {
 		if (!getStartedPostback(messaging)) {
-			switch (Payload.valueOf(messaging.getPostback().getPayload())) {
+			switch (CurtainPostbackParser.Payload.valueOf(messaging.getPostback().getPayload())) {
 
 				case NAVI_PAYLOAD:
 					postbackParser.navigation(messaging);
@@ -30,9 +34,33 @@ public class CurtainProcessor implements Processor {
 					postbackParser.createFilling(messaging);
 					break;
 
+				case CT_PRODUCT_PAYLOAD:
+					postbackParser.createProduct(messaging);
+					break;
+
 				default:
 					throw new BotException(messaging);
 			}
+		}
+	}
+
+	@Override
+	public void passQuickReply(Messaging messaging) {
+		String payloadWithAgrs = messaging.getMessage().getQuickReply().getPayload();
+		String commonPayload = QuickReplyUtils.getCommonPayload(payloadWithAgrs);
+
+		switch (CurtainQuickReplyParser.QuickReplyPayload.valueOf(commonPayload)) {
+
+			case NEXT_Q_PAYLOAD:
+				curtainQuickReplyParser.nextPayload(messaging);
+				break;
+
+			case COMMON_Q_PAYLOAD:
+				curtainQuickReplyParser.commonPayload(messaging);
+				break;
+
+			default:
+				throw new BotException(messaging);
 		}
 	}
 
@@ -44,5 +72,8 @@ public class CurtainProcessor implements Processor {
 	@Override
 	public void getStartedAction(Messaging messaging) {
 		postbackParser.getStarted(messaging);
+	}
+
+	private void nextPayload(Messaging messaging) {
 	}
 }

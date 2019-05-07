@@ -4,7 +4,7 @@ import com.messanger.*;
 import com.productbot.client.MessengerClient;
 import com.productbot.client.Platform;
 import com.productbot.client.UrlProps;
-import com.productbot.service.Payload;
+import com.productbot.service.curtain.CurtainPostbackParser;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -56,7 +56,7 @@ public class BotStart {
 		messengerProfileApi.setGetStarted(new GetStarted("GET_STARTED_PAYLOAD"));
 		PersistentMenu persistentMenu = new PersistentMenu();
 		persistentMenu.setCallToActions(Collections.singletonList(new MenuItem("postback", "Navigation",
-										Payload.NAVI_PAYLOAD.name())));
+										CurtainPostbackParser.Payload.NAVI_PAYLOAD.name())));
 
 		messengerProfileApi.setPersistentMenu(Collections.singletonList(persistentMenu));
 

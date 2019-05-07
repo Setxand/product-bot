@@ -4,27 +4,30 @@ import com.messanger.Messaging;
 import com.productbot.client.curtain.CurtainMessengerClient;
 import com.productbot.exceprion.BotException;
 import com.productbot.model.MessengerUser;
-import com.productbot.model.ProductFilling;
-import com.productbot.repository.FillingRepository;
 import com.productbot.repository.UserRepository;
 import com.productbot.service.MessageParser;
+import com.productbot.service.ProductService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ResourceBundle;
+
+import static com.productbot.model.MessengerUser.UserStatus.CREATE_PROD2;
+import static com.productbot.model.MessengerUser.UserStatus.CREATE_PROD3;
 
 @Service
 public class CurtainMessageParser implements MessageParser {
 
 	private final CurtainMessengerClient messengerClient;
 	private final UserRepository userRepo;
-	private final FillingRepository fillingRepo;
+	private final ProductService productService;
 
 	public CurtainMessageParser(CurtainMessengerClient messengerClient, UserRepository userRepo,
-								FillingRepository fillingRepo) {
+								ProductService productService) {
 		this.messengerClient = messengerClient;
 		this.userRepo = userRepo;
-		this.fillingRepo = fillingRepo;
+		this.productService = productService;
 	}
 
 	@Transactional
@@ -38,10 +41,41 @@ public class CurtainMessageParser implements MessageParser {
 				createFilling1(messaging);
 				break;
 
+			case CREATE_PROD1:
+				createProd(messaging, CREATE_PROD2);
+				break;
+
+			case CREATE_PROD2:
+				createProd(messaging, CREATE_PROD3);
+				break;
+
 			default:
-				botEx(messaging);
+				throw new BotException(messaging, "I do not support this kind of messages");
 		}
 
+	}
+
+	@Override
+	public UserRepository getUserRepo() {
+		return userRepo;
+	}
+
+	private void createProd(Messaging messaging, MessengerUser.UserStatus nextStatus) {
+		MessengerUser user = userRepo.getOne(messaging.getSender().getId());
+		productService.createProduct(messaging, user.getStatus());
+		setUserStatus(messaging, nextStatus);
+
+		String text = ResourceBundle.getBundle("dialog", user.getLocale()).getString(nextStatus.name());
+
+		if (nextStatus == CREATE_PROD3)
+			createProd3(messaging, text);
+		else
+			messengerClient.sendSimpleMessage(text, messaging);
+	}
+
+	private void createProd3(Messaging messaging, String text) {
+		messengerClient.sendFillingsAsQuickReplies(text, messaging,
+										productService.getProductFillings(PageRequest.of(0, 8)), 0);
 	}
 
 	private void botEx(Messaging messaging) {
@@ -50,15 +84,13 @@ public class CurtainMessageParser implements MessageParser {
 
 	private void createFilling1(Messaging messaging) {
 		try {
-			String[] fillingText = messaging.getMessage().getText().split(",");
+			productService.createFilling(messaging);
 
-			ProductFilling filling = new ProductFilling();
-			filling.setName(fillingText[0]);
-			filling.setPrice(Float.valueOf(fillingText[1]));
-			fillingRepo.saveAndFlush(filling);
-			MessengerUser user = userRepo.getOne(messaging.getSender().getId());
-			user.setStatus(null);
-			messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog").getString("DONE"), messaging);
+			MessengerUser user = setUserStatus(messaging, null);
+
+			messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
+					.getString("DONE"), messaging);
+			messengerClient.sendSimpleMessage(productService.getProductFillingsAsString(), messaging);
 
 		} catch (Exception ex) {
 			throw new BotException(messaging, "Try again");

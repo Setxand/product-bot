@@ -17,17 +17,23 @@ public class CommonProcessor implements Processor {
 
 	@Override
 	public void passPostback(Messaging messaging) {
-		getStartedPostback(messaging);
+		if (!getStartedPostback(messaging)) {
 
-		switch (messaging.getPostback().getPayload()) {
-			default:
-				throw new BotException(messaging, "This postback have not been implemented for now");
+			switch (messaging.getPostback().getPayload()) {
+				default:
+					throw new BotException(messaging, "This postback have not been implemented for now");
+			}
 		}
 	}
 
 	@Override
 	public void passMessage(Messaging messaging) {
 		throw new BotException(messaging, "Messages have not been implemented for now");
+	}
+
+	@Override
+	public void passQuickReply(Messaging messaging) {
+		throw new BotException(messaging, "QuickReplies have not been implemented for now");
 	}
 
 	@Override

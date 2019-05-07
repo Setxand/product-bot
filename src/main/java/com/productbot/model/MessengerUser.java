@@ -1,6 +1,5 @@
 package com.productbot.model;
 
-import com.productbot.service.UserStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +15,15 @@ import java.util.Locale;
 @Setter
 @NoArgsConstructor
 public class MessengerUser {
+
+	public enum UserStatus {
+
+		CREATE_FILLING1,
+		CREATE_PROD1,
+		CREATE_PROD2,
+		CREATE_PROD3
+
+	}
 
 	@Id
 	private Long id;

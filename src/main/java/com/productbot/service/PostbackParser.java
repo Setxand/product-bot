@@ -6,7 +6,7 @@ import com.productbot.model.MessengerUser;
 import com.productbot.model.Role;
 import com.productbot.repository.UserRepository;
 
-public interface PostbackParser {
+public interface PostbackParser extends Parser{
 
 	default UserData createUser(UserData userData, Long id) {
 		UserRepository userRepo = getUserRepo();
@@ -24,8 +24,6 @@ public interface PostbackParser {
 
 		return userData;
 	}
-
-	UserRepository getUserRepo();
 
 	void getStarted(Messaging messaging);
 
