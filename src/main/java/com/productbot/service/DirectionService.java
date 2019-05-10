@@ -6,7 +6,9 @@ import com.productbot.client.Platform;
 import com.productbot.processor.Processor;
 import com.productbot.processor.impl.CommonProcessor;
 import com.productbot.processor.impl.CurtainProcessor;
+import com.productbot.service.common.CommonMessageParser;
 import com.productbot.service.common.CommonPostbackParser;
+import com.productbot.service.common.CommonQuickReplyParser;
 import com.productbot.service.curtain.CurtainMessageParser;
 import com.productbot.service.curtain.CurtainPostbackParser;
 import com.productbot.service.curtain.CurtainQuickReplyParser;
@@ -24,10 +26,12 @@ public class DirectionService {
 	private final Map<Platform, Processor> processors;
 
 	public DirectionService(CommonPostbackParser commonPostbackParser, CurtainPostbackParser curtainPostbackParser,
-							CurtainMessageParser curtainMessageParser, CurtainQuickReplyParser curtainQuickReplyParser) {
+							CurtainMessageParser curtainMessageParser, CurtainQuickReplyParser curtainQuickReplyParser,
+							CommonMessageParser commonMessageParser, CommonQuickReplyParser commonQuickReplyParser) {
 
 		this.processors = new HashMap<>();
-		this.processors.put(Platform.COMMON, new CommonProcessor(commonPostbackParser));
+		this.processors.put(Platform.COMMON, new CommonProcessor(commonPostbackParser, commonMessageParser,
+				commonQuickReplyParser));
 		this.processors.put(Platform.CURTAIN, new CurtainProcessor(curtainPostbackParser, curtainMessageParser,
 				curtainQuickReplyParser));
 	}

@@ -2,6 +2,7 @@ package com.productbot.client;
 
 import com.messanger.Button;
 import com.messanger.Messaging;
+import com.messanger.QuickReply;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -20,11 +21,6 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 		sendSimpleMessage(ResourceBundle.getBundle("dictionary").getString("ERROR_MESSAGE"), messaging);
 	}
 
-	@Override
-	public void sendSimpleQuestion(Long aLong, String s, String s1, String s2) {
-/////todo
-	}
-
 	public void helloMessage(String userFirstName, Messaging messaging) {
 		sendSimpleMessage(String.format(ResourceBundle.getBundle("dictionary")
 													  .getString("HELLO_MESSAGE"), userFirstName), messaging);
@@ -40,5 +36,9 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 
 	public void sendPostbackButtons(Messaging messaging, String text, Button... buttons) {
 		sendButtons(Arrays.asList(buttons), text, messaging, "button", "template");
+	}
+
+	public void sendSimpleQuestion(String payload, Messaging messaging, String text) {
+		sendQuickReplies(text, messaging, new QuickReply("Yes", payload + "&1"), new QuickReply("No", payload + "&0"));
 	}
 }

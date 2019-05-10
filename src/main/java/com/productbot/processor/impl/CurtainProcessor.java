@@ -6,7 +6,7 @@ import com.productbot.processor.Processor;
 import com.productbot.service.curtain.CurtainMessageParser;
 import com.productbot.service.curtain.CurtainPostbackParser;
 import com.productbot.service.curtain.CurtainQuickReplyParser;
-import com.productbot.utils.QuickReplyUtils;
+import com.productbot.utils.PayloadUtils;
 
 public class CurtainProcessor implements Processor {
 
@@ -24,7 +24,8 @@ public class CurtainProcessor implements Processor {
 	@Override
 	public void passPostback(Messaging messaging) {
 		if (!getStartedPostback(messaging)) {
-			switch (CurtainPostbackParser.Payload.valueOf(messaging.getPostback().getPayload())) {
+			String payload = messaging.getPostback().getPayload();
+			switch (CurtainPostbackParser.CurtainPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
 
 				case NAVI_PAYLOAD:
 					postbackParser.navigation(messaging);
@@ -47,16 +48,24 @@ public class CurtainProcessor implements Processor {
 	@Override
 	public void passQuickReply(Messaging messaging) {
 		String payloadWithAgrs = messaging.getMessage().getQuickReply().getPayload();
-		String commonPayload = QuickReplyUtils.getCommonPayload(payloadWithAgrs);
+		String commonPayload = PayloadUtils.getCommonPayload(payloadWithAgrs);
 
 		switch (CurtainQuickReplyParser.QuickReplyPayload.valueOf(commonPayload)) {
 
 			case NEXT_Q_PAYLOAD:
-				curtainQuickReplyParser.nextPayload(messaging);
+				curtainQuickReplyParser.swipeButtons(messaging, true);
 				break;
 
 			case COMMON_Q_PAYLOAD:
 				curtainQuickReplyParser.commonPayload(messaging);
+				break;
+
+			case PREV_Q_PAYLOAD:
+				curtainQuickReplyParser.swipeButtons(messaging, false);
+				break;
+
+			case STOP_Q_PAYLOAD:
+				curtainQuickReplyParser.stopButton(messaging);
 				break;
 
 			default:
@@ -72,8 +81,5 @@ public class CurtainProcessor implements Processor {
 	@Override
 	public void getStartedAction(Messaging messaging) {
 		postbackParser.getStarted(messaging);
-	}
-
-	private void nextPayload(Messaging messaging) {
 	}
 }

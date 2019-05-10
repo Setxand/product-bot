@@ -56,7 +56,7 @@ public class BotStart {
 		messengerProfileApi.setGetStarted(new GetStarted("GET_STARTED_PAYLOAD"));
 		PersistentMenu persistentMenu = new PersistentMenu();
 		persistentMenu.setCallToActions(Collections.singletonList(new MenuItem("postback", "Navigation",
-										CurtainPostbackParser.Payload.NAVI_PAYLOAD.name())));
+										CurtainPostbackParser.CurtainPayload.NAVI_PAYLOAD.name())));
 
 		messengerProfileApi.setPersistentMenu(Collections.singletonList(persistentMenu));
 

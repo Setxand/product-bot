@@ -32,4 +32,22 @@ public class ProductValidator {
 		}
 
 	}
+
+	public float validatePriceAndReturnVal(String text, Messaging messaging) {
+		try {
+			return Float.valueOf(text);
+		} catch (Exception e) {
+			throw new BotException(messaging, "Invalid price, try again");
+		}
+	}
+
+	public String validatePhone(Messaging messaging) {
+		String phone = messaging.getMessage().getText();
+
+		if (phone.length() != 13 || phone.chars().filter(ch -> ch == '+').count() != 1 ||!phone.startsWith("+")) {
+			throw new BotException(messaging, "Incorrect phone");
+		}
+
+		return phone;
+	}
 }
