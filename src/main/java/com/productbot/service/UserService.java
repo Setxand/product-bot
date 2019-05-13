@@ -10,6 +10,8 @@ import com.productbot.model.Role;
 import com.productbot.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
 public class UserService {
 
@@ -19,6 +21,7 @@ public class UserService {
 		this.userRepo = userRepo;
 	}
 
+	@Transactional
 	public MessengerUser setUserStatus(Messaging messaging, MessengerUser.UserStatus userStatus) {
 		MessengerUser user = userRepo.getOne(messaging.getSender().getId());
 		user.setStatus(userStatus);

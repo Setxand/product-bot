@@ -35,6 +35,18 @@ public class CommonProcessor implements Processor {
 					postbackParser.startOrder(messaging);
 					break;
 
+				case ADD_PRODUCT_PAYLOAD:
+					postbackParser.addProduct(messaging);
+					break;
+
+				case NEXT_PROD_PAYLOAD:
+					postbackParser.directMenu(messaging, true);
+					break;
+
+				case PREV_PROD_PAYLOAD:
+					postbackParser.directMenu(messaging, false);
+					break;
+
 				default:
 					throw new BotException(messaging);
 			}

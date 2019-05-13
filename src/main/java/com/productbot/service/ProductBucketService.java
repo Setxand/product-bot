@@ -41,23 +41,44 @@ public class ProductBucketService {
 
 	}
 
+	@Transactional
+	public void closeBucket(Messaging messaging) {
+		getBucket(messaging).setOrderProcess(null);
+	}
+
+	@Transactional
+	public void addProd(Messaging messaging) {
+		ProductBucket bucket = getBucket(messaging);
+		String payload = messaging.getPostback().getPayload();
+
+		String productToAdd = PayloadUtils.getParams(payload)[0];
+		bucket.getProducts().add(productToAdd);
+	}
+
 	private void ordering2(Messaging messaging) {
-		ProductBucket bucket = bucketRepo.getOne(messaging.getSender().getId().toString());
+		ProductBucket bucket = getBucket(messaging);
 		bucket.setLocation(messaging.getMessage().getText());
 	}
 
 	private void ordering1(Messaging messaging) {
-		if (!bucketRepo.findById(messaging.getSender().getId().toString()).isPresent()) {
+		if (!bucketRepo.findByUserIdAndOrderProcessIsTrue(messaging.getSender().getId()
+				.toString()).isPresent()) {
 
 			ProductBucket bucket = new ProductBucket();
-			bucket.setId(messaging.getSender().getId().toString());
+			bucket.setUserId(messaging.getSender().getId().toString());
 			String productId = PayloadUtils.getParams(messaging.getPostback().getPayload())[0];
 			bucket.getProducts().add(productId);
+			bucket.setOrderProcess(true);
 			bucketRepo.save(bucket);
 
 		} else {
-			ProductBucket bucket = bucketRepo.getOne(messaging.getSender().getId().toString());
+			ProductBucket bucket = getBucket(messaging);
 			bucket.setPhone(productValidator.validatePhone(messaging));
 		}
+	}
+
+	private ProductBucket getBucket(Messaging messaging) {
+		return bucketRepo.findByUserIdAndOrderProcessIsTrue(messaging.getSender().getId()
+				.toString()).orElseThrow(() -> new BotException(messaging));
 	}
 }

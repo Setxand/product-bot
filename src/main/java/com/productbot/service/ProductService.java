@@ -18,12 +18,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.productbot.service.common.CommonPostbackParser.CommonPayload.ADD_PRODUCT_PAYLOAD;
-import static com.productbot.service.common.CommonPostbackParser.CommonPayload.ORDER_PAYLOAD;
+import static com.productbot.service.common.CommonPostbackParser.CommonPayload.*;
 import static java.util.stream.Collectors.toMap;
 
 @Service
@@ -110,7 +110,7 @@ public class ProductService {
 		product.getFillings().add(fillingId);
 	}
 
-	public List<Element> getMenuElements(Messaging messaging, int page, boolean addProduct) {
+	public List<Element> getMenuElements(Messaging messaging, int page, Boolean addProduct) {
 		Page<Product> products = getProducts(PageRequest.of(page, 10));
 		Map<String, String> fillingsMap = products.stream().collect(toMap(Product::getId, p -> {
 
@@ -122,13 +122,33 @@ public class ProductService {
 			return stringBuilder.toString();
 		}));
 
-		return products.stream().map(p -> DtoUtils
+
+		List<Element> list = products.stream().map(p -> DtoUtils
 				.element(p, fillingsMap.get(p.getId()), getButton(addProduct, p.getId()))).collect(Collectors.toList());
+
+		if (products.hasNext())
+			directionButtons(list, products, addProduct, true);
+		if (products.hasPrevious())
+			directionButtons(list, products, addProduct, false);
+
+		return list;
 	}
 
-	private Button getButton(boolean addProduct, String productId) {
+	private void directionButtons(List<Element> list, Page<Product> products, Boolean addProduct, boolean isNext) {
+
+		ArrayList<Button> buttons = new ArrayList<>(list.get(isNext ? 9 : 0).getButtons());
+
+		buttons.add(new Button(isNext ? "Next ->" : "<- Previous",
+				PayloadUtils.createPayloadWithParams(isNext ? NEXT_PROD_PAYLOAD.name() : PREV_PROD_PAYLOAD.name(),
+						"" + products.getNumber(), Boolean.toString(addProduct))));
+
+		list.get(isNext ? 9 : 0).setButtons(buttons);
+	}
+
+	private Button getButton(Boolean addProduct, String productId) {
+		if (addProduct == null) return null;
 		return addProduct ? new Button(
-					"Add", PayloadUtils.createPayloadWithParams(ADD_PRODUCT_PAYLOAD.name(), productId)) :
-							new Button("Order", PayloadUtils.createPayloadWithParams(ORDER_PAYLOAD.name(), productId));
+				"Add", PayloadUtils.createPayloadWithParams(ADD_PRODUCT_PAYLOAD.name(), productId)) :
+				new Button("Order", PayloadUtils.createPayloadWithParams(ORDER_PAYLOAD.name(), productId));
 	}
 }

@@ -20,7 +20,7 @@ public class DtoUtils {
 
 	public static Element element(Product product, String fillings, Button ...button) {
 		Element element = new Element();
-		element.setTitle(product.getName());
+		element.setTitle(product.getName() + " - " + product.getPrice());
 		element.setImage_url(product.getImage());
 		element.setSubtitle(fillings);
 		element.setButtons(Arrays.asList(button));

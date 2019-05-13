@@ -26,6 +26,7 @@ public class ProductValidator {
 
 	public void validateUrl(String text, Messaging messaging) {
 		try {
+			if (text.length() > 255) throw new IllegalArgumentException();
 			urlEditor.setAsText(text);
 		} catch (IllegalArgumentException ex) {
 			throw new BotException(messaging, "Invalid URL, try again");
