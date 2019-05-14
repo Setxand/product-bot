@@ -23,7 +23,10 @@ public class CommonPostbackParser {
 		ORDER_PAYLOAD,
 		ADD_PRODUCT_PAYLOAD,
 		NEXT_PROD_PAYLOAD,
-		PREV_PROD_PAYLOAD
+		PREV_PROD_PAYLOAD,
+		MENU_PAYLOAD,
+		NAVIGATION_MENU,
+		CREATE_OWN_PAYLOAD
 
 	}
 
@@ -76,5 +79,9 @@ public class CommonPostbackParser {
 		boolean addProd = Boolean.parseBoolean(PayloadUtils.getParams(payload)[1]);
 
 		messengerClient.sendGenericTemplate(productService.getMenuElements(messaging, page, addProd), messaging);
+	}
+
+	public void navigation(Messaging messaging) {
+		messengerClient.navigation(messaging);
 	}
 }

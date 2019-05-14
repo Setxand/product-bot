@@ -57,13 +57,18 @@ public class CommonMessageParser {
 		return true;
 	}
 
+	public void sendMenu(Messaging messaging) {
+		messengerClient.sendGenericTemplate(productService.getMenuElements(messaging, 0, false), messaging);
+	}
+
 	public void messageByText(Messaging messaging) {
 
 		switch (messaging.getMessage().getText()) {
 
 			case "menu":
-				messengerClient.sendGenericTemplate(productService.getMenuElements(messaging, 0, false), messaging);
+				sendMenu(messaging);
 				break;
+
 			default:
 				throw new BotException(messaging, "I do not know this command");
 		}

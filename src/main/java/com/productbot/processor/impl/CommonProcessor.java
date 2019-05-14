@@ -47,6 +47,14 @@ public class CommonProcessor implements Processor {
 					postbackParser.directMenu(messaging, false);
 					break;
 
+				case MENU_PAYLOAD:
+					messageParser.sendMenu(messaging);
+					break;
+
+				case NAVIGATION_MENU:
+					postbackParser.navigation(messaging);
+					break;
+
 				default:
 					throw new BotException(messaging);
 			}

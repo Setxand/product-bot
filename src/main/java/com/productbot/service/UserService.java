@@ -37,8 +37,8 @@ public class UserService {
 			messengerUser.setLastName(userData.getLastName());
 			messengerUser.setLocale(userData.getLocale());
 			messengerUser.setRole(Role.USER);
-			userRepo.save(messengerUser);
-			return messengerUser;
+
+			return userRepo.save(messengerUser);
 		});
 	}
 
