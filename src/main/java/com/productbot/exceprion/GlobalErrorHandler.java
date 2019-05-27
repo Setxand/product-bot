@@ -20,10 +20,4 @@ public class GlobalErrorHandler {
 			messengerClient.errorMessage(ex.getMessaging());
 		}
 	}
-
-//	@ExceptionHandler(Exception.class)
-//	public void handleCommonException(Exception ex) {
-//		messengerClient.sendSimpleMessage(ex.getLocalizedMessage());
-//	}
-
 }

@@ -35,11 +35,11 @@ public class ProductService {
 	private final ProductHelperService productHelper;
 
 	public ProductService(ProductValidator productValidator, FillingRepository fillingRepo,
-						  ProductRepository productRepo, ProductHelperService productHelper) {
+						  ProductRepository productRepo) {
 		this.productValidator = productValidator;
 		this.fillingRepo = fillingRepo;
 		this.productRepo = productRepo;
-		this.productHelper = productHelper;
+		this.productHelper = new ProductHelperService(productValidator, productRepo);
 	}
 
 	public String getProductFillingsAsString() {
@@ -97,13 +97,13 @@ public class ProductService {
 
 	@Transactional
 	public void productCreated(Messaging messaging) {
-		Product product = productRepo.findByMetaInf(messaging.getSender().getId().toString());
+		Product product = productRepo.findByMetaInfAndIsOwn(messaging.getSender().getId().toString(), false);
 		product.setMetaInf(null);
 	}
 
 	@Transactional
 	public void addProdFilling(Messaging messaging) {
-		Product product = productRepo.findByMetaInf(messaging.getSender().getId().toString());
+		Product product = productRepo.findByMetaInfAndIsOwn(messaging.getSender().getId().toString(), false);
 
 		String[] params = PayloadUtils.getParams(messaging.getMessage().getQuickReply().getPayload());
 		String fillingId = params[0];

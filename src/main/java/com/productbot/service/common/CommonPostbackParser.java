@@ -1,8 +1,9 @@
 package com.productbot.service.common;
 
 import com.messanger.Messaging;
-import com.productbot.client.MessengerClient;
+import com.productbot.client.common.CommonMessengerClient;
 import com.productbot.model.MessengerUser;
+import com.productbot.service.PostbackHelper;
 import com.productbot.service.ProductBucketService;
 import com.productbot.service.ProductService;
 import com.productbot.service.UserService;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ResourceBundle;
 
+import static com.productbot.model.MessengerUser.UserStatus.CREATE_PROD1;
 import static com.productbot.service.common.CommonQuickReplyParser.QuestionContext.SOME_ELSE_CONTEXT;
 
 @Service
@@ -30,17 +32,19 @@ public class CommonPostbackParser {
 
 	}
 
-	private final MessengerClient messengerClient;
+	private final CommonMessengerClient messengerClient;
 	private final UserService userService;
 	private final ProductBucketService productBucketService;
 	private final ProductService productService;
+	private final PostbackHelper postbackHelper;
 
-	public CommonPostbackParser(MessengerClient messengerClient, UserService userService,
+	public CommonPostbackParser(CommonMessengerClient messengerClient, UserService userService,
 								ProductBucketService productBucketService, ProductService productService) {
 		this.messengerClient = messengerClient;
 		this.userService = userService;
 		this.productBucketService = productBucketService;
 		this.productService = productService;
+		this.postbackHelper = new PostbackHelper(productService, messengerClient, userService);
 	}
 
 	public void getStarted(Messaging messaging) {
@@ -83,5 +87,10 @@ public class CommonPostbackParser {
 
 	public void navigation(Messaging messaging) {
 		messengerClient.navigation(messaging);
+	}
+
+	public void createOwnProduct(Messaging messaging) {
+//		productService.createProduct();
+		postbackHelper.createProd(messaging, CREATE_PROD1);
 	}
 }

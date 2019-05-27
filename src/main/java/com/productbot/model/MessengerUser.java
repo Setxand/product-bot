@@ -4,10 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 @Entity
@@ -26,7 +25,8 @@ public class MessengerUser {
 		CREATE_PROD5,
 		ORDERING1,
 		ORDERING2,
-		ORDERING3
+		ORDERING3,
+		SETTING_ROLE1
 
 	}
 
@@ -35,6 +35,10 @@ public class MessengerUser {
 	private String firstName;
 	private String lastName;
 	private Locale locale;
+	private String image;
+
+	@OneToMany(cascade = CascadeType.ALL)
+	private List<Product> ownProducts = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
 	private UserStatus status;

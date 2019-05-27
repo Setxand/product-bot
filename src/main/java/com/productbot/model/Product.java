@@ -26,6 +26,7 @@ public class Product {
 	// In general "metaInf" is used for creation product, and user id is set in. So it needs unique value.
 	@Column(unique = true)
 	private String metaInf;
+	private Boolean isOwn;
 
 	@ElementCollection
 	private List<String> fillings = new ArrayList<>();

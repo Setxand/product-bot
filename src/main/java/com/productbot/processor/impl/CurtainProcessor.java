@@ -39,6 +39,10 @@ public class CurtainProcessor implements Processor {
 					postbackParser.createProduct(messaging);
 					break;
 
+				case SET_ROLE_PAYLOAD:
+					postbackParser.setRole(messaging);
+					break;
+
 				default:
 					throw new BotException(messaging);
 			}

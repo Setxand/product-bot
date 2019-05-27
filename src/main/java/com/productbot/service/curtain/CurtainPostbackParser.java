@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ResourceBundle;
 
+import static com.productbot.model.MessengerUser.UserStatus.SETTING_ROLE1;
+
 @Service
 public class CurtainPostbackParser {
 
@@ -20,7 +22,8 @@ public class CurtainPostbackParser {
 		CT_FILLING_PAYLOAD,
 		CT_PRODUCT_PAYLOAD,
 		NAVI_PAYLOAD,
-		GET_STARTED_PAYLOAD
+		GET_STARTED_PAYLOAD,
+		SET_ROLE_PAYLOAD
 
 	}
 
@@ -28,12 +31,16 @@ public class CurtainPostbackParser {
 	private final UserService userService;
 	private final ProductService productService;
 
-
 	public CurtainPostbackParser(CurtainMessengerClient messengerClient,
 								 UserService userService, ProductService productService) {
 		this.messengerClient = messengerClient;
 		this.userService = userService;
 		this.productService = productService;
+	}
+
+	public void setRole(Messaging messaging) {
+		userService.setUserStatus(messaging, SETTING_ROLE1);
+		messengerClient.sendSimpleMessage("Enter name of user: ", messaging);
 	}
 
 	@Transactional
@@ -46,8 +53,8 @@ public class CurtainPostbackParser {
 		}
 
 		userService.setUserStatus(messaging, MessengerUser.UserStatus.CREATE_PROD1);
-						messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
-											.getString(MessengerUser.UserStatus.CREATE_PROD1.name()), messaging);
+		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
+				.getString(MessengerUser.UserStatus.CREATE_PROD1.name()), messaging);
 	}
 
 	public void getStarted(Messaging messaging) {
@@ -67,6 +74,6 @@ public class CurtainPostbackParser {
 		MessengerUser user = userService.setUserStatus(messaging, MessengerUser.UserStatus.CREATE_FILLING1);
 
 		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
-						.getString(MessengerUser.UserStatus.CREATE_FILLING1.name()), messaging);
+				.getString(MessengerUser.UserStatus.CREATE_FILLING1.name()), messaging);
 	}
 }

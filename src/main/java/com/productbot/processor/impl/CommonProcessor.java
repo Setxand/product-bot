@@ -55,6 +55,10 @@ public class CommonProcessor implements Processor {
 					postbackParser.navigation(messaging);
 					break;
 
+				case CREATE_OWN_PAYLOAD:
+					postbackParser.createOwnProduct(messaging);
+					break;
+
 				default:
 					throw new BotException(messaging);
 			}

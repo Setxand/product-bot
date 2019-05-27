@@ -3,18 +3,25 @@ package com.productbot.client;
 import com.messanger.Button;
 import com.messanger.Messaging;
 import com.messanger.QuickReply;
-import com.productbot.service.common.CommonPostbackParser;
+import com.productbot.model.ProductFilling;
+import com.productbot.service.curtain.CurtainQuickReplyParser;
+import com.productbot.utils.PayloadUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.COMMON_Q_PAYLOAD;
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class MessengerClient extends com.messanger.client.MessengerClient {
 
 	public MessengerClient(UrlProps urlProps) {
 		super(urlProps.getMap().get("accessTokMap"), urlProps.getMap().get("server"), urlProps.getMap().get("webhook"),
-							urlProps.getMap().get("urlMap"));
+				urlProps.getMap().get("urlMap"));
 	}
 
 	@Override
@@ -24,7 +31,7 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 
 	public void helloMessage(String userFirstName, Messaging messaging) {
 		sendSimpleMessage(String.format(ResourceBundle.getBundle("dictionary")
-													  .getString("HELLO_MESSAGE"), userFirstName), messaging);
+				.getString("HELLO_MESSAGE"), userFirstName), messaging);
 	}
 
 	public Button getPButton(String title, String payload) {
@@ -43,9 +50,31 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 		sendQuickReplies(text, messaging, new QuickReply("Yes", payload + "&1"), new QuickReply("No", payload + "&0"));
 	}
 
-	public void navigation(Messaging messaging) {
-		sendPostbackButtons(messaging, "Navigation",
-				getPButton("Menu", CommonPostbackParser.CommonPayload.MENU_PAYLOAD.name()),
-				getPButton("Create own product", CommonPostbackParser.CommonPayload.CREATE_OWN_PAYLOAD.name()));
+	public void sendFillingsAsQuickReplies(String text, Messaging messaging,
+										   Page<ProductFilling> fillingList, int firstEl) {
+
+		List<QuickReply> list = fillingList.stream()
+				.map(f -> new QuickReply(f.getName(), PayloadUtils.createPayloadWithParams(COMMON_Q_PAYLOAD.name(),
+						String.valueOf(f.getId()), String.valueOf(firstEl)))).collect(toList());
+
+		additionalButtons(list, firstEl, fillingList);
+		sendQuickReplies(text, messaging, list.toArray(new QuickReply[0]));
+	}
+
+	private void additionalButtons(List<QuickReply> list, int firstEl, Page<ProductFilling> fillingList) {
+
+		list.add(new QuickReply("That`s it", CurtainQuickReplyParser.QuickReplyPayload.STOP_Q_PAYLOAD.name()));
+
+		if (firstEl > 0) {
+
+			list.add(0, new QuickReply(" <- previous",
+					PayloadUtils.createPayloadWithParams(CurtainQuickReplyParser.QuickReplyPayload
+							.PREV_Q_PAYLOAD.name(), String.valueOf(firstEl))));
+		}
+
+		if (firstEl < fillingList.getTotalPages() - 1) {
+			list.add(new QuickReply("next -> ", PayloadUtils.createPayloadWithParams(CurtainQuickReplyParser.
+					QuickReplyPayload.NEXT_Q_PAYLOAD.name(), String.valueOf(firstEl))));
+		}
 	}
 }

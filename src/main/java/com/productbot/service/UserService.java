@@ -11,6 +11,7 @@ import com.productbot.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -36,6 +37,7 @@ public class UserService {
 			messengerUser.setFirstName(userData.getFirstName());
 			messengerUser.setLastName(userData.getLastName());
 			messengerUser.setLocale(userData.getLocale());
+			messengerUser.setImage(userData.getPicture());
 			messengerUser.setRole(Role.USER);
 
 			return userRepo.save(messengerUser);
@@ -45,5 +47,23 @@ public class UserService {
 	public MessengerUser getUser(Long id) {
 		return userRepo.findById(id).orElseThrow(
 						() -> new BotException(new Messaging(new Message(), new Recipient(id))));
+	}
+
+	public List<MessengerUser> getUsersByName(Messaging messaging, String name) {
+		String[] fullName = validateUserName(messaging, name);
+
+		return userRepo.findAllByFirstNameAndLastName(fullName[0], fullName[1]);
+	}
+
+	private String[] validateUserName(Messaging messaging, String name) {
+		String[] fullName = name.split(" ");
+
+		if (fullName.length != 2) botEx(messaging, "It Needs only name and last name");
+
+		return fullName;
+	}
+
+	private void botEx(Messaging messaging, String s) {
+		throw new BotException(messaging, s);
 	}
 }

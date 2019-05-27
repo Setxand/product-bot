@@ -4,10 +4,8 @@ import com.messanger.Messaging;
 import com.productbot.model.Product;
 import com.productbot.repository.ProductRepository;
 import com.productbot.validator.ProductValidator;
-import org.springframework.stereotype.Service;
 
 
-@Service
 public class ProductHelperService {
 
 	private final ProductValidator productValidator;
@@ -28,12 +26,12 @@ public class ProductHelperService {
 	void setProductImage(Messaging messaging) {
 		String text = messaging.getMessage().getText();
 		productValidator.validateUrl(text, messaging);
-		Product product = productRepo.findByMetaInf(messaging.getSender().getId().toString());
+		Product product = productRepo.findByMetaInfAndIsOwn(messaging.getSender().getId().toString(), true);
 		product.setImage(messaging.getMessage().getText());
 	}
 
 	void setProductPrice(Messaging messaging) {
-		Product product = productRepo.findByMetaInf(messaging.getSender().getId().toString());
+		Product product = productRepo.findByMetaInfAndIsOwn(messaging.getSender().getId().toString(), true);
 		float price = productValidator.validatePriceAndReturnVal(messaging.getMessage().getText(), messaging);
 		product.setPrice(price);
 	}
