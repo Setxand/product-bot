@@ -75,15 +75,18 @@ public class CommonProcessor implements Processor {
 	public void passQuickReply(Messaging messaging) {
 		String payload = messaging.getMessage().getQuickReply().getPayload();
 
-		switch (CurtainQuickReplyParser.QuickReplyPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
+		if (payload.contains("+") && payload.length() == 13)
+			passMessage(messaging);
+		else
+			switch (CurtainQuickReplyParser.QuickReplyPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
 
-			case QUESTION_PAYLOAD:
-				questionPayload(messaging);
-				break;
+				case QUESTION_PAYLOAD:
+					questionPayload(messaging);
+					break;
 
-			default:
-				throw new BotException(messaging);
-		}
+				default:
+					throw new BotException(messaging);
+			}
 
 	}
 

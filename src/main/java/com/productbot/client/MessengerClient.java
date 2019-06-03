@@ -47,7 +47,8 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 	}
 
 	public void sendSimpleQuestion(String payload, Messaging messaging, String text) {
-		sendQuickReplies(text, messaging, new QuickReply("Yes", payload + "&1"), new QuickReply("No", payload + "&0"));
+		sendQuickReplies(text, messaging, new QuickReply("Yes", payload + "&1"),
+				new QuickReply("No", payload + "&0"));
 	}
 
 	public void sendFillingsAsQuickReplies(String text, Messaging messaging,
@@ -60,6 +61,14 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 		additionalButtons(list, firstEl, fillingList);
 		sendQuickReplies(text, messaging, list.toArray(new QuickReply[0]));
 	}
+
+	public void sendTypedQuickReply(String text, Messaging messaging, String type) {
+		QuickReply quickReply = new QuickReply();
+		quickReply.setContentType(type);
+
+		sendQuickReplies(text, messaging, quickReply);
+	}
+
 
 	private void additionalButtons(List<QuickReply> list, int firstEl, Page<ProductFilling> fillingList) {
 

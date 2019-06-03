@@ -60,8 +60,9 @@ public class CommonPostbackParser {
 		MessengerUser user = userService.setUserStatus(messaging, MessengerUser.UserStatus.ORDERING1);
 		productBucketService.makeOrder(messaging, user.getStatus());
 
-		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
-				.getString(user.getStatus().name()), messaging);
+		messengerClient.sendTypedQuickReply("Enter tour phone number: ", messaging, "user_phone_number");
+//		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
+//				.getString(user.getStatus().name()), messaging);todo
 	}
 
 	public void addProduct(Messaging messaging) {

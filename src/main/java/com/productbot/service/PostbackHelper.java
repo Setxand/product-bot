@@ -36,7 +36,7 @@ public class PostbackHelper {
 	public void setRole(Messaging messaging) {
 		String name = messaging.getMessage().getText();
 		List<MessengerUser> users = userService.getUsersByName(messaging, name);
-		//////todo
+//		messengerClient.sendUsersAsQuickReplies();todo
 	}
 
 	private void statusAction(Messaging messaging, MessengerUser.UserStatus nextStatus, String text) {

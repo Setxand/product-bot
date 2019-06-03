@@ -1,5 +1,6 @@
 package com.productbot.service;
 
+import com.messanger.Attachment;
 import com.messanger.Messaging;
 import com.productbot.exceprion.BotException;
 import com.productbot.model.MessengerUser;
@@ -57,7 +58,11 @@ public class ProductBucketService {
 
 	private void ordering2(Messaging messaging) {
 		ProductBucket bucket = getBucket(messaging);
-		bucket.setLocation(messaging.getMessage().getText());
+		Attachment attachment = messaging.getMessage().getAttachments().get(0);
+
+		if (attachment.getType().equals("location")) {
+			bucket.setLocation(attachment.getUrl());
+		} else throw new BotException(messaging);
 	}
 
 	private void ordering1(Messaging messaging) {

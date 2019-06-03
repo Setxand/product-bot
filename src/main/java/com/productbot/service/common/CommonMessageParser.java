@@ -92,8 +92,8 @@ public class CommonMessageParser {
 
 	private void ordering1(Messaging messaging, MessengerUser user) {
 		makeOrderAndSetStatus(messaging, user, ORDERING2);
-
-		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
-				.getString(user.getStatus().name()), messaging);
+		messengerClient.sendTypedQuickReply("Enter your location: ", messaging, "location");
+//		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
+//				.getString(user.getStatus().name()), messaging);todo
 	}
 }
