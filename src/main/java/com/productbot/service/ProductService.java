@@ -134,6 +134,10 @@ public class ProductService {
 		return list;
 	}
 
+	public Product getProduct(String id) {
+		return productRepo.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+	}
+
 	private void directionButtons(List<Element> list, Page<Product> products, Boolean addProduct, boolean isNext) {
 
 		ArrayList<Button> buttons = new ArrayList<>(list.get(isNext ? 9 : 0).getButtons());

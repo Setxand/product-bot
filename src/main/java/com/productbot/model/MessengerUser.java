@@ -36,6 +36,8 @@ public class MessengerUser {
 	private String lastName;
 	private Locale locale;
 	private String image;
+	private String adminMetaInfo;
+	private String platform;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<Product> ownProducts = new ArrayList<>();

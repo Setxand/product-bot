@@ -17,10 +17,13 @@ public class ProductBucketService {
 
 	private final ProductBucketRepository bucketRepo;
 	private final ProductValidator productValidator;
+	private final CourierService courierService;
 
-	public ProductBucketService(ProductBucketRepository bucketRepo, ProductValidator productValidator) {
+	public ProductBucketService(ProductBucketRepository bucketRepo, ProductValidator productValidator,
+								CourierService courierService) {
 		this.bucketRepo = bucketRepo;
 		this.productValidator = productValidator;
+		this.courierService = courierService;
 	}
 
 	@Transactional
@@ -44,7 +47,10 @@ public class ProductBucketService {
 
 	@Transactional
 	public void closeBucket(Messaging messaging) {
-		getBucket(messaging).setOrderProcess(null);
+		ProductBucket bucket = getBucket(messaging);
+		bucket.setOrderProcess(null);
+
+		courierService.publishBucket(messaging, bucket);
 	}
 
 	@Transactional

@@ -3,7 +3,6 @@ package com.productbot.service.common;
 import com.messanger.Messaging;
 import com.productbot.client.common.CommonMessengerClient;
 import com.productbot.model.MessengerUser;
-import com.productbot.service.PostbackHelper;
 import com.productbot.service.ProductBucketService;
 import com.productbot.service.ProductService;
 import com.productbot.service.UserService;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ResourceBundle;
 
-import static com.productbot.model.MessengerUser.UserStatus.CREATE_PROD1;
 import static com.productbot.service.common.CommonQuickReplyParser.QuestionContext.SOME_ELSE_CONTEXT;
 
 @Service
@@ -36,7 +34,6 @@ public class CommonPostbackParser {
 	private final UserService userService;
 	private final ProductBucketService productBucketService;
 	private final ProductService productService;
-	private final PostbackHelper postbackHelper;
 
 	public CommonPostbackParser(CommonMessengerClient messengerClient, UserService userService,
 								ProductBucketService productBucketService, ProductService productService) {
@@ -44,13 +41,12 @@ public class CommonPostbackParser {
 		this.userService = userService;
 		this.productBucketService = productBucketService;
 		this.productService = productService;
-		this.postbackHelper = new PostbackHelper(productService, messengerClient, userService);
 	}
 
 	public void getStarted(Messaging messaging) {
 		Long id = messaging.getSender().getId();
 		String userFirstName = userService.createUser(messengerClient
-				.getFacebookUserInfo(id, messaging.getPlatform()), id).getFirstName();
+				.getFacebookUserInfo(id, messaging.getPlatform()), id, messaging.getPlatform()).getFirstName();
 
 		messengerClient.helloMessage(userFirstName, messaging);
 	}
@@ -61,8 +57,6 @@ public class CommonPostbackParser {
 		productBucketService.makeOrder(messaging, user.getStatus());
 
 		messengerClient.sendTypedQuickReply("Enter tour phone number: ", messaging, "user_phone_number");
-//		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
-//				.getString(user.getStatus().name()), messaging);todo
 	}
 
 	public void addProduct(Messaging messaging) {
@@ -91,7 +85,6 @@ public class CommonPostbackParser {
 	}
 
 	public void createOwnProduct(Messaging messaging) {
-//		productService.createProduct();
-		postbackHelper.createProd(messaging, CREATE_PROD1);
+//		postbackHelper.createProd(messaging, CREATE_PROD1);
 	}
 }

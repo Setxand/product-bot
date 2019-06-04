@@ -72,6 +72,10 @@ public class CurtainProcessor implements Processor {
 				curtainQuickReplyParser.stopButton(messaging);
 				break;
 
+			case SET_ROLE_PAYLOAD:
+				curtainQuickReplyParser.setRole(messaging);
+				break;
+
 			default:
 				throw new BotException(messaging);
 		}

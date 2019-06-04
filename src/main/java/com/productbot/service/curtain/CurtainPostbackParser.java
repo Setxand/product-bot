@@ -60,7 +60,7 @@ public class CurtainPostbackParser {
 	public void getStarted(Messaging messaging) {
 		UserData userData = DtoUtils.user(userService.createUser(
 				messengerClient.getFacebookUserInfo(messaging.getSender().getId(),
-						messaging.getPlatform()), messaging.getSender().getId()));
+						messaging.getPlatform()), messaging.getSender().getId(), messaging.getPlatform()));
 
 		messengerClient.helloMessage(userData.getFirstName(), messaging);
 	}

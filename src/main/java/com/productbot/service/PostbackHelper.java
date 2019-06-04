@@ -3,11 +3,13 @@ package com.productbot.service;
 import com.messanger.Messaging;
 import com.productbot.client.MessengerClient;
 import com.productbot.model.MessengerUser;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
 import java.util.ResourceBundle;
 
+import static com.productbot.client.Platform.CURTAIN;
 import static com.productbot.model.MessengerUser.UserStatus.CREATE_PROD3;
 import static com.productbot.model.MessengerUser.UserStatus.CREATE_PROD5;
 
@@ -16,12 +18,14 @@ public class PostbackHelper {
 	private final ProductService productService;
 	private final MessengerClient messengerClient;
 	private final UserService userService;
+	private final ApplicationEventPublisher eventPublisher;
 
-	public PostbackHelper(ProductService productService, MessengerClient messengerClient,
-						  UserService userService) {
+	public PostbackHelper(ProductService productService, MessengerClient messengerClient, UserService userService,
+						  ApplicationEventPublisher eventPublisher) {
 		this.productService = productService;
 		this.messengerClient = messengerClient;
 		this.userService = userService;
+		this.eventPublisher = eventPublisher;
 	}
 
 	public void createProd(Messaging messaging, MessengerUser.UserStatus nextStatus) {
@@ -35,8 +39,8 @@ public class PostbackHelper {
 
 	public void setRole(Messaging messaging) {
 		String name = messaging.getMessage().getText();
-		List<MessengerUser> users = userService.getUsersByName(messaging, name);
-//		messengerClient.sendUsersAsQuickReplies();todo
+		Page<MessengerUser> users = userService.getUsersByNameAndPlatform(messaging, name, CURTAIN.name());
+		messengerClient.sendUsersAsQuickReplies(messaging, users);
 	}
 
 	private void statusAction(Messaging messaging, MessengerUser.UserStatus nextStatus, String text) {

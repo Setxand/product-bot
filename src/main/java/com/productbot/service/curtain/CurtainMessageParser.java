@@ -4,9 +4,11 @@ import com.messanger.Messaging;
 import com.productbot.client.curtain.CurtainMessengerClient;
 import com.productbot.exceprion.BotException;
 import com.productbot.model.MessengerUser;
+import com.productbot.service.CourierService;
 import com.productbot.service.PostbackHelper;
 import com.productbot.service.ProductService;
 import com.productbot.service.UserService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -21,13 +23,15 @@ public class CurtainMessageParser {
 	private final UserService userService;
 	private final ProductService productService;
 	private final PostbackHelper postbackHelper;
+	private final ApplicationEventPublisher eventPublisher;
 
 	public CurtainMessageParser(CurtainMessengerClient messengerClient,
-								UserService userService, ProductService productService) {
+								UserService userService, ProductService productService, CourierService courierService, ApplicationEventPublisher eventPublisher) {
 		this.messengerClient = messengerClient;
 		this.userService = userService;
 		this.productService = productService;
-		postbackHelper = new PostbackHelper(productService, messengerClient, userService);
+		this.eventPublisher = eventPublisher;
+		postbackHelper = new PostbackHelper(productService, messengerClient, userService, eventPublisher);
 	}
 
 	@Transactional
