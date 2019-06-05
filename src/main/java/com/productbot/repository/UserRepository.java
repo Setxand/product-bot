@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<MessengerUser, Long> {
@@ -22,4 +23,6 @@ public interface UserRepository extends JpaRepository<MessengerUser, Long> {
 	Page<MessengerUser> findUsersByRole(Role role, Pageable pageable);
 
 	Optional<MessengerUser> findByIdAndPlatform(Long id, String platform);
+
+	List<MessengerUser> findByIdIn(List<Long> id);
 }

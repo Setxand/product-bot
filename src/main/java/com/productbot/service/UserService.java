@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -62,6 +63,10 @@ public class UserService {
 
 	public Page<MessengerUser> findUsersByRole(Role role) {
 		return userRepo.findUsersByRole(role, PageRequest.of(0, 50));
+	}
+
+	public List<MessengerUser> listUsersByIds(List<Long> ids) {
+		return userRepo.findByIdIn(ids);
 	}
 
 	private String[] validateUserName(Messaging messaging, String name) {

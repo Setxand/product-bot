@@ -4,6 +4,7 @@ import com.messanger.Messaging;
 import com.messanger.UserData;
 import com.productbot.client.curtain.CurtainMessengerClient;
 import com.productbot.model.MessengerUser;
+import com.productbot.service.ProductBucketService;
 import com.productbot.service.ProductService;
 import com.productbot.service.UserService;
 import com.productbot.utils.DtoUtils;
@@ -23,19 +24,23 @@ public class CurtainPostbackParser {
 		CT_PRODUCT_PAYLOAD,
 		NAVI_PAYLOAD,
 		GET_STARTED_PAYLOAD,
-		SET_ROLE_PAYLOAD
+		SET_ROLE_PAYLOAD,
+		ORDERINGS_LIST_PAYLOAD,
+		GET_ORDER_PAYLOAD
 
 	}
 
 	private final CurtainMessengerClient messengerClient;
 	private final UserService userService;
 	private final ProductService productService;
+	private final ProductBucketService productBucketService;
 
 	public CurtainPostbackParser(CurtainMessengerClient messengerClient,
-								 UserService userService, ProductService productService) {
+								 UserService userService, ProductService productService, ProductBucketService productBucketService) {
 		this.messengerClient = messengerClient;
 		this.userService = userService;
 		this.productService = productService;
+		this.productBucketService = productBucketService;
 	}
 
 	public void setRole(Messaging messaging) {
@@ -75,5 +80,9 @@ public class CurtainPostbackParser {
 
 		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
 				.getString(MessengerUser.UserStatus.CREATE_FILLING1.name()), messaging);
+	}
+
+	public void orderingList(Messaging messaging) {
+		messengerClient.sendGenericTemplate(productBucketService.getOrderingList(0), messaging);
 	}
 }

@@ -21,7 +21,8 @@ public class CurtainMessengerClient extends MessengerClient {
 	public void navigation(Messaging messaging) {
 		sendPostbackButtons(messaging, "Navigation:", getPButton("Create filling",
 				CT_FILLING_PAYLOAD.name()), getPButton("Create product", CT_PRODUCT_PAYLOAD.name()),
-				getPButton("Set role", SET_ROLE_PAYLOAD.name()));
+//				getPButton("Set role", SET_ROLE_PAYLOAD.name()),todo
+				getPButton("Orderings list", ORDERINGS_LIST_PAYLOAD.name()));
 	}
 
 	public void sendRoleQuickReplies(String text, Messaging messaging) {
@@ -34,5 +35,6 @@ public class CurtainMessengerClient extends MessengerClient {
 	private String rolePayload(Role role) {
 		return PayloadUtils.createPayloadWithParams(SET_ROLE_PAYLOAD.name(), role.name());
 	}
+
 
 }

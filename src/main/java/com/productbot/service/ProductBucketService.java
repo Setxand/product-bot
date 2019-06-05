@@ -1,16 +1,24 @@
 package com.productbot.service;
 
 import com.messanger.Attachment;
+import com.messanger.Element;
 import com.messanger.Messaging;
 import com.productbot.exceprion.BotException;
 import com.productbot.model.MessengerUser;
+import com.productbot.model.Product;
 import com.productbot.model.ProductBucket;
 import com.productbot.repository.ProductBucketRepository;
+import com.productbot.utils.DtoUtils;
 import com.productbot.utils.PayloadUtils;
 import com.productbot.validator.ProductValidator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductBucketService {
@@ -18,12 +26,16 @@ public class ProductBucketService {
 	private final ProductBucketRepository bucketRepo;
 	private final ProductValidator productValidator;
 	private final CourierService courierService;
+	private final UserService userService;
+	private final ProductService productService;
 
 	public ProductBucketService(ProductBucketRepository bucketRepo, ProductValidator productValidator,
-								CourierService courierService) {
+								CourierService courierService, UserService userService, ProductService productService) {
 		this.bucketRepo = bucketRepo;
 		this.productValidator = productValidator;
 		this.courierService = courierService;
+		this.userService = userService;
+		this.productService = productService;
 	}
 
 	@Transactional
@@ -60,6 +72,25 @@ public class ProductBucketService {
 
 		String productToAdd = PayloadUtils.getParams(payload)[0];
 		bucket.getProducts().add(productToAdd);
+	}
+
+	public List<Element> getOrderingList(int pageNumber) {
+		Page<ProductBucket> bucketPage = bucketRepo.findAll(PageRequest.of(pageNumber, 10));
+
+		List<ProductBucket> buckets = bucketPage.getContent();
+
+		Map<String, String> userNames = userService.listUsersByIds(buckets.stream().map(ProductBucket::getUserId)
+				.map(Long::parseLong)
+				.collect(Collectors.toList())).stream()
+				.collect(Collectors.toMap(u -> u.getId().toString(), u -> u.getFirstName() + " " + u.getLastName()));
+
+		Map<String, List<String>> productMap = buckets.stream()
+				.collect(Collectors.toMap(ProductBucket::getId, b -> b.getProducts().stream()
+				.map(productService::getProduct).map(Product::getName).collect(Collectors.toList())));
+
+		return buckets.stream()
+				.map(productBucket -> DtoUtils.orderingElement(productBucket, userNames, productMap))
+				.collect(Collectors.toList());
 	}
 
 	private void ordering2(Messaging messaging) {

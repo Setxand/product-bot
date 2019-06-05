@@ -43,6 +43,10 @@ public class CurtainProcessor implements Processor {
 					postbackParser.setRole(messaging);
 					break;
 
+				case ORDERINGS_LIST_PAYLOAD:
+					postbackParser.orderingList(messaging);
+					break;
+
 				default:
 					throw new BotException(messaging);
 			}
@@ -76,9 +80,23 @@ public class CurtainProcessor implements Processor {
 				curtainQuickReplyParser.setRole(messaging);
 				break;
 
+			case QUESTION_PAYLOAD:
+				questionPayload(messaging);
+				break;
+
 			default:
 				throw new BotException(messaging);
 		}
+	}
+
+	private void questionPayload(Messaging messaging) {
+		String payload = messaging.getMessage().getQuickReply().getPayload();
+		String questionContext = PayloadUtils.getParams(payload)[0];
+
+		if (questionContext.equals("PUBLISH_BUCKET")) {
+			curtainQuickReplyParser.courierAcceptance(messaging, payload);
+		}
+
 	}
 
 	@Override
