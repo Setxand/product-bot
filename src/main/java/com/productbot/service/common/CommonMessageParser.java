@@ -58,7 +58,8 @@ public class CommonMessageParser {
 	}
 
 	public void sendMenu(Messaging messaging) {
-		messengerClient.sendGenericTemplate(productService.getMenuElements(messaging, 0, false), messaging);
+		messengerClient.sendGenericTemplate(productService.getMenuElements(0, ProductService.MenuType.ORDER),
+				messaging);
 	}
 
 	public void messageByText(Messaging messaging) {

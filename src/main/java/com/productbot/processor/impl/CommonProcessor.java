@@ -3,6 +3,7 @@ package com.productbot.processor.impl;
 import com.messanger.Messaging;
 import com.productbot.exceprion.BotException;
 import com.productbot.processor.Processor;
+import com.productbot.service.PostbackPayload;
 import com.productbot.service.common.CommonMessageParser;
 import com.productbot.service.common.CommonPostbackParser;
 import com.productbot.service.common.CommonQuickReplyParser;
@@ -29,7 +30,7 @@ public class CommonProcessor implements Processor {
 		if (!getStartedPostback(messaging)) {
 			String payload = messaging.getPostback().getPayload();
 
-			switch (CommonPostbackParser.CommonPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
+			switch (PostbackPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
 
 				case ORDER_PAYLOAD:
 					postbackParser.startOrder(messaging);

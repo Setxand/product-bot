@@ -1,5 +1,6 @@
 package com.productbot.client.curtain;
 
+import com.messanger.Button;
 import com.messanger.Messaging;
 import com.messanger.QuickReply;
 import com.productbot.client.MessengerClient;
@@ -9,7 +10,7 @@ import com.productbot.utils.PayloadUtils;
 import org.springframework.stereotype.Component;
 
 import static com.productbot.model.Role.*;
-import static com.productbot.service.curtain.CurtainPostbackParser.CurtainPayload.*;
+import static com.productbot.service.PostbackPayload.SET_ROLE_PAYLOAD;
 
 @Component
 public class CurtainMessengerClient extends MessengerClient {
@@ -18,11 +19,8 @@ public class CurtainMessengerClient extends MessengerClient {
 		super(urlProps);
 	}
 
-	public void navigation(Messaging messaging) {
-		sendPostbackButtons(messaging, "Navigation:", getPButton("Create filling",
-				CT_FILLING_PAYLOAD.name()), getPButton("Create product", CT_PRODUCT_PAYLOAD.name()),
-//				getPButton("Set role", SET_ROLE_PAYLOAD.name()),todo
-				getPButton("Orderings list", ORDERINGS_LIST_PAYLOAD.name()));
+	public void navigation(Messaging messaging, Role role) {
+		sendPostbackButtons(messaging, "Navigation:", role.getNavigationButtons().toArray(new Button[0]));
 	}
 
 	public void sendRoleQuickReplies(String text, Messaging messaging) {
@@ -35,6 +33,4 @@ public class CurtainMessengerClient extends MessengerClient {
 	private String rolePayload(Role role) {
 		return PayloadUtils.createPayloadWithParams(SET_ROLE_PAYLOAD.name(), role.name());
 	}
-
-
 }

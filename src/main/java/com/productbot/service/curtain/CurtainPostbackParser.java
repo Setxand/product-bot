@@ -4,10 +4,12 @@ import com.messanger.Messaging;
 import com.messanger.UserData;
 import com.productbot.client.curtain.CurtainMessengerClient;
 import com.productbot.model.MessengerUser;
+import com.productbot.service.PostbackPayload;
 import com.productbot.service.ProductBucketService;
 import com.productbot.service.ProductService;
 import com.productbot.service.UserService;
 import com.productbot.utils.DtoUtils;
+import com.productbot.utils.PayloadUtils;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -17,18 +19,6 @@ import static com.productbot.model.MessengerUser.UserStatus.SETTING_ROLE1;
 
 @Service
 public class CurtainPostbackParser {
-
-	public enum CurtainPayload {
-
-		CT_FILLING_PAYLOAD,
-		CT_PRODUCT_PAYLOAD,
-		NAVI_PAYLOAD,
-		GET_STARTED_PAYLOAD,
-		SET_ROLE_PAYLOAD,
-		ORDERINGS_LIST_PAYLOAD,
-		GET_ORDER_PAYLOAD
-
-	}
 
 	private final CurtainMessengerClient messengerClient;
 	private final UserService userService;
@@ -71,7 +61,7 @@ public class CurtainPostbackParser {
 	}
 
 	public void navigation(Messaging messaging) {
-		messengerClient.navigation(messaging);
+		messengerClient.navigation(messaging, userService.getUser(messaging.getSender().getId()).getRole());
 	}
 
 	@Transactional
@@ -84,5 +74,23 @@ public class CurtainPostbackParser {
 
 	public void orderingList(Messaging messaging) {
 		messengerClient.sendGenericTemplate(productBucketService.getOrderingList(0), messaging);
+	}
+
+	public void updateProduct(Messaging messaging) {
+		messengerClient.sendGenericTemplate(productService.getMenuElements(0, ProductService.MenuType.UPDATE),
+				messaging);
+	}
+
+	public void switchMenu(Messaging messaging) {
+		String basePayload = messaging.getPostback().getPayload();
+		String[] params = PayloadUtils.getParams(basePayload);
+		String payload = PayloadUtils.getCommonPayload(basePayload);
+
+		int currentPage = Integer.parseInt(params[0]);
+		int setPage = PostbackPayload.valueOf(payload) == PostbackPayload.NEXT_PROD_PAYLOAD ?
+				currentPage + 1 : currentPage - 1;
+
+		messengerClient.sendGenericTemplate(productService
+				.getMenuElements(setPage, ProductService.MenuType.valueOf(params[1])), messaging);
 	}
 }

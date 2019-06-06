@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.productbot.service.curtain.CurtainPostbackParser.CurtainPayload.GET_ORDER_PAYLOAD;
+import static com.productbot.service.PostbackPayload.GET_ORDER_PAYLOAD;
 
 public class DtoUtils {
 
@@ -21,8 +21,7 @@ public class DtoUtils {
 		Element element = new Element();
 		element.setTitle(userNames.get(productBucket.getUserId()) + ", " + productBucket.getPhone());
 		element.setSubtitle(String.join(",", productMap.get(productBucket.getId())));
-		element.setImage_url(
-				"https://thumbs.dreamstime.com/z/complaints-claims-design-illustration-eps-graphic-73434328.jpg");
+		element.setImage_url("http://cdn.onlinewebfonts.com/svg/download_568523.png");
 
 		element.setButtons(Arrays.asList(new Button("Get order", GET_ORDER_PAYLOAD.name()),
 				ButtonUtils.getUrlButton("Location", productBucket.getLocation())));

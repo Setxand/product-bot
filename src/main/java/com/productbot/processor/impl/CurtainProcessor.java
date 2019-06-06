@@ -3,6 +3,7 @@ package com.productbot.processor.impl;
 import com.messanger.Messaging;
 import com.productbot.exceprion.BotException;
 import com.productbot.processor.Processor;
+import com.productbot.service.PostbackPayload;
 import com.productbot.service.curtain.CurtainMessageParser;
 import com.productbot.service.curtain.CurtainPostbackParser;
 import com.productbot.service.curtain.CurtainQuickReplyParser;
@@ -25,7 +26,7 @@ public class CurtainProcessor implements Processor {
 	public void passPostback(Messaging messaging) {
 		if (!getStartedPostback(messaging)) {
 			String payload = messaging.getPostback().getPayload();
-			switch (CurtainPostbackParser.CurtainPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
+			switch (PostbackPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
 
 				case NAVI_PAYLOAD:
 					postbackParser.navigation(messaging);
@@ -33,6 +34,14 @@ public class CurtainProcessor implements Processor {
 
 				case CT_FILLING_PAYLOAD:
 					postbackParser.createFilling(messaging);
+					break;
+
+				case NEXT_PROD_PAYLOAD:
+					postbackParser.switchMenu(messaging);
+					break;
+
+				case PREV_PROD_PAYLOAD:
+					postbackParser.switchMenu(messaging);
 					break;
 
 				case CT_PRODUCT_PAYLOAD:
@@ -47,8 +56,12 @@ public class CurtainProcessor implements Processor {
 					postbackParser.orderingList(messaging);
 					break;
 
+				case UPDATE_PRODUCT_PAYLOAD:
+					postbackParser.updateProduct(messaging);
+					break;
+
 				default:
-					throw new BotException(messaging);
+					throw new BotException(messaging, "This feature hasn't been provided yet");
 			}
 		}
 	}

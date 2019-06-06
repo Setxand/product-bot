@@ -3,10 +3,12 @@ package com.productbot.service;
 import com.messanger.Messaging;
 import com.productbot.client.MessengerClient;
 import com.productbot.model.MessengerUser;
+import com.productbot.model.Product;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 import static com.productbot.client.Platform.CURTAIN;
@@ -52,9 +54,10 @@ public class PostbackHelper {
 		} else if (nextStatus == CREATE_PROD5) {
 
 			userService.setUserStatus(messaging, null);
-			productService.productCreated(messaging);
+			Product product = productService.productCreated(messaging);
 			messengerClient.sendSimpleMessage(text, messaging);
-			messengerClient.sendGenericTemplate(productService.getMenuElements(messaging, 0, true), messaging);
+			messengerClient.sendGenericTemplate(Collections.singletonList(productService
+					.getElement(product.getId())), messaging);
 
 		} else
 			messengerClient.sendSimpleMessage(text, messaging);

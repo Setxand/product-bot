@@ -18,18 +18,6 @@ import static com.productbot.service.common.CommonQuickReplyParser.QuestionConte
 @Service
 public class CommonPostbackParser {
 
-	public enum CommonPayload {
-
-		ORDER_PAYLOAD,
-		ADD_PRODUCT_PAYLOAD,
-		NEXT_PROD_PAYLOAD,
-		PREV_PROD_PAYLOAD,
-		MENU_PAYLOAD,
-		NAVIGATION_MENU,
-		CREATE_OWN_PAYLOAD
-
-	}
-
 	private final CommonMessengerClient messengerClient;
 	private final UserService userService;
 	private final ProductBucketService productBucketService;
@@ -75,9 +63,9 @@ public class CommonPostbackParser {
 		String payload = messaging.getPostback().getPayload();
 		int page = Integer.parseInt(PayloadUtils.getParams(payload)[0]);
 		page += isNext ? 1  : (-1);
-		boolean addProd = Boolean.parseBoolean(PayloadUtils.getParams(payload)[1]);
+		ProductService.MenuType menuType = ProductService.MenuType.valueOf(PayloadUtils.getParams(payload)[1]);
 
-		messengerClient.sendGenericTemplate(productService.getMenuElements(messaging, page, addProd), messaging);
+		messengerClient.sendGenericTemplate(productService.getMenuElements(page, menuType), messaging);
 	}
 
 	public void navigation(Messaging messaging) {

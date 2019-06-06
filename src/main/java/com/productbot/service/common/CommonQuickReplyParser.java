@@ -32,7 +32,8 @@ public class CommonQuickReplyParser {
 		int answer = Integer.parseInt(PayloadUtils.getParams(messaging.getMessage().getQuickReply().getPayload())[1]);
 
 		if (answer == 1) {
-			messengerClient.sendGenericTemplate(productService.getMenuElements(messaging, 0, true), messaging);
+			messengerClient.sendGenericTemplate(productService.getMenuElements(0, ProductService.MenuType.ADD),
+					messaging);
 
 		} else {
 			userService.setUserStatus(messaging, null);

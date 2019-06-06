@@ -1,6 +1,5 @@
 package com.productbot.service;
 
-import com.messanger.Button;
 import com.messanger.Element;
 import com.messanger.Messaging;
 import com.productbot.exceprion.BotException;
@@ -18,16 +17,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.productbot.service.common.CommonPostbackParser.CommonPayload.*;
 import static java.util.stream.Collectors.toMap;
 
 @Service
 public class ProductService {
+
+	public enum MenuType {
+		ADD,
+		ORDER,
+		UPDATE
+	}
 
 	private final ProductValidator productValidator;
 	private final FillingRepository fillingRepo;
@@ -86,19 +89,21 @@ public class ProductService {
 				break;
 
 			default:
-				throw new BotException(messaging, "The best practice is to use navigation)");
+				throw new BotException(messaging, "Simply get control panel with the help of your context menu, " +
+						"or enter: 'navigation' in your chat string.");
 		}
 
 	}
 
-	public ProductFilling getFilling(String fillingId, Messaging messaging) {
-		return fillingRepo.findById(fillingId).orElseThrow(() -> new BotException(messaging));
+	public ProductFilling getFilling(String fillingId) {
+		return fillingRepo.findById(fillingId).orElseThrow(() -> new IllegalArgumentException("Invalid filling ID"));
 	}
 
 	@Transactional
-	public void productCreated(Messaging messaging) {
+	public Product productCreated(Messaging messaging) {
 		Product product = productRepo.findByMetaInfAndIsOwn(messaging.getSender().getId().toString(), false);
 		product.setMetaInf(null);
+		return product;
 	}
 
 	@Transactional
@@ -110,49 +115,32 @@ public class ProductService {
 		product.getFillings().add(fillingId);
 	}
 
-	public List<Element> getMenuElements(Messaging messaging, int page, Boolean addProduct) {
+	public Element getElement(String productId) {
+		Product product = getProduct(productId);
+		String fillings = product.getFillings().stream().map(f -> getFilling(f).getName())
+				.collect(Collectors.joining(", "));
+
+		return DtoUtils.element(product, fillings);
+	}
+
+	public List<Element> getMenuElements(int page, MenuType menuType) {
 		Page<Product> products = getProducts(PageRequest.of(page, 10));
-		Map<String, String> fillingsMap = products.stream().collect(toMap(Product::getId, p -> {
-
-			StringBuilder stringBuilder = new StringBuilder();
-			p.getFillings().forEach(f -> stringBuilder
-					.append(getFilling(f, messaging).getName()).append(", "));
-
-			stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length() - 1);
-			return stringBuilder.toString();
-		}));
-
+		Map<String, String> fillingsMap = products.stream().collect(toMap(Product::getId,
+				p -> p.getFillings().stream().map(f -> getFilling(f).getName()).collect(Collectors.joining(", "))));
 
 		List<Element> list = products.stream().map(p -> DtoUtils
-				.element(p, fillingsMap.get(p.getId()), getButton(addProduct, p.getId()))).collect(Collectors.toList());
+				.element(p, fillingsMap.get(p.getId()), productHelper.getButtons(menuType, p.getId())))
+				.collect(Collectors.toList());
 
 		if (products.hasNext())
-			directionButtons(list, products, addProduct, true);
+			productHelper.directionButtons(list, products, menuType, true);
 		if (products.hasPrevious())
-			directionButtons(list, products, addProduct, false);
+			productHelper.directionButtons(list, products, menuType, false);
 
 		return list;
 	}
 
 	public Product getProduct(String id) {
 		return productRepo.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
-	}
-
-	private void directionButtons(List<Element> list, Page<Product> products, Boolean addProduct, boolean isNext) {
-
-		ArrayList<Button> buttons = new ArrayList<>(list.get(isNext ? 9 : 0).getButtons());
-
-		buttons.add(new Button(isNext ? "Next ->" : "<- Previous",
-				PayloadUtils.createPayloadWithParams(isNext ? NEXT_PROD_PAYLOAD.name() : PREV_PROD_PAYLOAD.name(),
-						"" + products.getNumber(), Boolean.toString(addProduct))));
-
-		list.get(isNext ? 9 : 0).setButtons(buttons);
-	}
-
-	private Button getButton(Boolean addProduct, String productId) {
-		if (addProduct == null) return null;
-		return addProduct ? new Button(
-				"Add", PayloadUtils.createPayloadWithParams(ADD_PRODUCT_PAYLOAD.name(), productId)) :
-				new Button("Order", PayloadUtils.createPayloadWithParams(ORDER_PAYLOAD.name(), productId));
 	}
 }
