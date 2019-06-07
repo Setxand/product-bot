@@ -61,7 +61,7 @@ public class ProductHelperService {
 			case UPDATE:
 				return new Button[]{
 						new Button("Update",
-								PayloadUtils.createPayloadWithParams(UPDATE_PRODUCT_PAYLOAD.name(), productId)),
+								PayloadUtils.createPayloadWithParams(UPDATE_PROCESS_PAYLOAD.name(), productId)),
 						new Button("Delete",
 								PayloadUtils.createPayloadWithParams(DELETE_PRODUCT_PAYLOAD.name(), productId))};
 

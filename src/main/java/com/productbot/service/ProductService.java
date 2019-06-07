@@ -141,6 +141,15 @@ public class ProductService {
 	}
 
 	public Product getProduct(String id) {
-		return productRepo.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+		return productRepo.findById(id).orElseGet(() -> {
+			Product product = new Product();
+			product.setName("Deleted product");
+			return product;
+		});
+	}
+
+	@Transactional
+	public void deleteProduct(String productId) {
+		productRepo.deleteById(productId);
 	}
 }

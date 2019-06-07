@@ -75,8 +75,7 @@ public class ProductBucketService {
 	}
 
 	public List<Element> getOrderingList(int pageNumber) {
-		Page<ProductBucket> bucketPage = bucketRepo.findAll(PageRequest.of(pageNumber, 10));
-
+		Page<ProductBucket> bucketPage = bucketRepo.findAllByAcceptedIsFalse(PageRequest.of(pageNumber, 10));
 		List<ProductBucket> buckets = bucketPage.getContent();
 
 		Map<String, String> userNames = userService.listUsersByIds(buckets.stream().map(ProductBucket::getUserId)

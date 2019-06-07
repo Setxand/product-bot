@@ -60,8 +60,20 @@ public class CurtainProcessor implements Processor {
 					postbackParser.updateProduct(messaging);
 					break;
 
+				case DELETE_PRODUCT_PAYLOAD:
+					postbackParser.deleteProduct(messaging);
+					break;
+
+				case GET_ORDER_PAYLOAD:
+					postbackParser.getOrder(messaging);
+					break;
+
+				case UPDATE_PROCESS_PAYLOAD:
+					postbackParser.updateProcess(messaging);
+					break;
+
 				default:
-					throw new BotException(messaging, "This feature hasn't been provided yet");
+					throw new BotException(messaging, "This feature hasn't been provided yet", payload);
 			}
 		}
 	}
@@ -98,7 +110,7 @@ public class CurtainProcessor implements Processor {
 				break;
 
 			default:
-				throw new BotException(messaging);
+				throw new BotException(messaging, "This feature hasn't been provided yet", payloadWithAgrs);
 		}
 	}
 
@@ -106,9 +118,23 @@ public class CurtainProcessor implements Processor {
 		String payload = messaging.getMessage().getQuickReply().getPayload();
 		String questionContext = PayloadUtils.getParams(payload)[0];
 
-		if (questionContext.equals("PUBLISH_BUCKET")) {
-			curtainQuickReplyParser.courierAcceptance(messaging, payload);
+		switch (CurtainQuickReplyParser.QuickReplyPayload.valueOf(questionContext)) {
+
+			case PUBLISH_BUCKET:
+				curtainQuickReplyParser.courierAcceptance(messaging, payload);
+				break;
+
+			case DELETE_PRODUCT_PAYLOAD:
+				curtainQuickReplyParser.deleteProduct(messaging, payload);
+				break;
+
+			case GET_ORDER_PAYLOAD:
+				curtainQuickReplyParser.getOrder(messaging, payload);
+				break;
+
+				default: throw new BotException(messaging, "This feature hasn't been provided yet", payload);
 		}
+
 
 	}
 

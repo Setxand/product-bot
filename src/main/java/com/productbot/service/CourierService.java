@@ -63,7 +63,7 @@ public class CourierService {
 
 	@Transactional
 	public void addProductBucket(Messaging messaging, String bucketId) {
-		ProductBucket productBucket = bucketRepo.findById(bucketId).orElseThrow(() -> new BotException(messaging));
+		ProductBucket productBucket = getBucket(bucketId);
 		Courier courier = courierRepo
 				.findById(messaging.getSender().getId().toString()).orElseThrow(() -> new BotException(messaging));
 
@@ -91,6 +91,21 @@ public class CourierService {
 							user.getFirstName() + " " + user.getLastName(),
 					courierMessaging);
 		});
+	}
+
+	@Transactional
+	public void acceptCourierOrder(Messaging messaging) {
+		Courier courier = courierRepo.findById(messaging.getSender().getId().toString())
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Courier ID"));
+
+		String bucketId = PayloadUtils.getParams(messaging.getMessage().getQuickReply().getPayload())[1];
+		ProductBucket bucket = getBucket(bucketId);
+		bucket.setAccepted(true);
+		courier.getBucketList().add(bucket);
+	}
+
+	private ProductBucket getBucket(String bucketId) {
+		return bucketRepo.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("Invalid Bucket ID"));
 	}
 
 	private String createOrderingString(ProductBucket bucket, MessengerUser user) {

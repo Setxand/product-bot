@@ -1,7 +1,10 @@
 package com.productbot.utils;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+
+import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.QUESTION_PAYLOAD;
 
 public class PayloadUtils {
 
@@ -23,5 +26,13 @@ public class PayloadUtils {
 
 	public static String createPayloadWithParams(String payload, String... params) {
 		return createPayloadWithParams(payload, Arrays.asList(params));
+	}
+
+	public static String reformPayloadForQuestion(String payload) {
+		String base = getCommonPayload(payload);
+		String[] params = getParams(payload);
+		List<String> list = new LinkedList<>(Arrays.asList(params));
+		list.add(0, base);
+		return createPayloadWithParams(QUESTION_PAYLOAD.name(), list.toArray(new String[0]));
 	}
 }

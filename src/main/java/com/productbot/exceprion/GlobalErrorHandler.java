@@ -22,7 +22,7 @@ public class GlobalErrorHandler {
 
 			messengerClient.errorMessage(ex.getMessaging());
 		}
-		log.warn("Error: ", ex);
+		log.warn(String.format("Error: {Data : %s}", ex.getData()), ex);
 	}
 
 	@ExceptionHandler(Exception.class)

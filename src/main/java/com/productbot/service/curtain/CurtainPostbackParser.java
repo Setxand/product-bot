@@ -1,7 +1,9 @@
 package com.productbot.service.curtain;
 
+import com.messanger.Button;
 import com.messanger.Messaging;
 import com.messanger.UserData;
+import com.productbot.client.UrlProps;
 import com.productbot.client.curtain.CurtainMessengerClient;
 import com.productbot.model.MessengerUser;
 import com.productbot.service.PostbackPayload;
@@ -16,6 +18,7 @@ import javax.transaction.Transactional;
 import java.util.ResourceBundle;
 
 import static com.productbot.model.MessengerUser.UserStatus.SETTING_ROLE1;
+import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.QUESTION_PAYLOAD;
 
 @Service
 public class CurtainPostbackParser {
@@ -24,13 +27,16 @@ public class CurtainPostbackParser {
 	private final UserService userService;
 	private final ProductService productService;
 	private final ProductBucketService productBucketService;
+	private final UrlProps urlProps;
 
 	public CurtainPostbackParser(CurtainMessengerClient messengerClient,
-								 UserService userService, ProductService productService, ProductBucketService productBucketService) {
+								 UserService userService, ProductService productService,
+								 ProductBucketService productBucketService, UrlProps urlProps) {
 		this.messengerClient = messengerClient;
 		this.userService = userService;
 		this.productService = productService;
 		this.productBucketService = productBucketService;
+		this.urlProps = urlProps;
 	}
 
 	public void setRole(Messaging messaging) {
@@ -92,5 +98,24 @@ public class CurtainPostbackParser {
 
 		messengerClient.sendGenericTemplate(productService
 				.getMenuElements(setPage, ProductService.MenuType.valueOf(params[1])), messaging);
+	}
+
+	public void deleteProduct(Messaging messaging) {
+		String payload = messaging.getPostback().getPayload();
+		String[] params = PayloadUtils.getParams(payload);
+
+		messengerClient.sendSimpleQuestion(PayloadUtils.createPayloadWithParams(QUESTION_PAYLOAD.name(),
+				PayloadUtils.getCommonPayload(payload), params[0]), messaging,
+				"Are you sure you want to delete this product?");
+	}
+
+	public void getOrder(Messaging messaging) {
+		String questionPayload = PayloadUtils.reformPayloadForQuestion(messaging.getPostback().getPayload());
+		messengerClient.sendSimpleQuestion(questionPayload, messaging, "Are you sure you want to get this order?");
+	}
+
+	public void updateProcess(Messaging messaging) {
+		messengerClient.sendPostbackButtons(messaging, "Click to update",
+				new Button("Update").urlButton(urlProps.getMap().get("server") + "/v1/products").webView());
 	}
 }

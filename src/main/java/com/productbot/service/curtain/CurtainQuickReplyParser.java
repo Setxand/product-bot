@@ -25,7 +25,9 @@ public class CurtainQuickReplyParser {
 		STOP_Q_PAYLOAD,
 		QUESTION_PAYLOAD,
 		SET_ROLE_PAYLOAD,
-		PUBLISH_BUCKET
+		PUBLISH_BUCKET,
+		DELETE_PRODUCT_PAYLOAD,
+		GET_ORDER_PAYLOAD
 	}
 
 	private final UserService userService;
@@ -108,11 +110,45 @@ public class CurtainQuickReplyParser {
 	public void courierAcceptance(Messaging messaging, String payload) {
 		String[] params = PayloadUtils.getParams(payload);
 
-		if (Integer.parseInt(params[params.length - 1]) == 1) {
+		if (quickReplyAnswer(params)) {
 			courierService.addProductBucket(messaging, params[1]);
 			messengerClient.sendSimpleMessage("Added", messaging);
 			courierService.courierAccepted(messaging);
 		}
 
+	}
+
+	public void deleteProduct(Messaging messaging, String payload) {
+		String[] params = PayloadUtils.getParams(payload);
+
+		if (quickReplyAnswer(params)) {
+			productService.deleteProduct(params[1]);
+			messengerClient.sendSimpleMessage("Done! Check it out:", messaging);
+			messengerClient
+					.sendGenericTemplate(productService.getMenuElements(0, ProductService.MenuType.UPDATE), messaging);
+
+		} else {
+			declined(messaging);
+		}
+	}
+
+	public void getOrder(Messaging messaging, String payload) {
+		String[] params = PayloadUtils.getParams(payload);
+
+		if (quickReplyAnswer(params)) {
+			courierService.acceptCourierOrder(messaging);
+			messengerClient.sendSimpleMessage("Done", messaging);
+
+		} else {
+			declined(messaging);
+		}
+	}
+
+	private void declined(Messaging messaging) {
+		messengerClient.sendSimpleMessage("Declined", messaging);
+	}
+
+	private boolean quickReplyAnswer(String[] params) {
+		return Integer.parseInt(params[params.length - 1]) == 1;
 	}
 }

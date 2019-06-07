@@ -27,7 +27,7 @@ public class ProductBucket {
 
 	// There is only one process per user might be true
 	private Boolean orderProcess;
-	private Boolean accepted;
+	private boolean accepted;
 
 	@ElementCollection
 	private List<String> products = new ArrayList<>();
