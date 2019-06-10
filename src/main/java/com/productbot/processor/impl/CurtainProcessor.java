@@ -68,10 +68,6 @@ public class CurtainProcessor implements Processor {
 					postbackParser.getOrder(messaging);
 					break;
 
-				case UPDATE_PROCESS_PAYLOAD:
-					postbackParser.updateProcess(messaging);
-					break;
-
 				default:
 					throw new BotException(messaging, "This feature hasn't been provided yet", payload);
 			}

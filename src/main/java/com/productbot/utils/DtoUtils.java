@@ -3,9 +3,12 @@ package com.productbot.utils;
 import com.messanger.Button;
 import com.messanger.Element;
 import com.messanger.UserData;
+import com.productbot.dto.FillingDTO;
+import com.productbot.dto.ProductDTO;
 import com.productbot.model.MessengerUser;
 import com.productbot.model.Product;
 import com.productbot.model.ProductBucket;
+import com.productbot.model.ProductFilling;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +17,14 @@ import java.util.Map;
 import static com.productbot.service.PostbackPayload.GET_ORDER_PAYLOAD;
 
 public class DtoUtils {
+
+	public static FillingDTO filling(ProductFilling entity) {
+		FillingDTO dto = new FillingDTO();
+		dto.name = entity.getName();
+		dto.price = entity.getPrice();
+		dto.id = entity.getId();
+		return dto;
+	}
 
 	public static Element orderingElement(ProductBucket productBucket, Map<String, String> userNames,
 										  Map<String, List<String>> productMap, Button... buttons) {
@@ -43,5 +54,14 @@ public class DtoUtils {
 		element.setSubtitle(fillings);
 		element.setButtons(Arrays.asList(button));
 		return element;
+	}
+
+	public static ProductDTO product(Product entity) {
+		ProductDTO dto = new ProductDTO();
+		dto.id = entity.getId();
+		dto.name = entity.getName();
+		dto.image = entity.getImage();
+		dto.price = entity.getPrice();
+		return dto;
 	}
 }

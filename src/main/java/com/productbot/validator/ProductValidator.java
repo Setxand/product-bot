@@ -1,7 +1,9 @@
 package com.productbot.validator;
 
 import com.messanger.Messaging;
+import com.productbot.dto.ProductDTO;
 import com.productbot.exceprion.BotException;
+import com.productbot.model.Product;
 import org.springframework.beans.propertyeditors.URLEditor;
 import org.springframework.stereotype.Component;
 
@@ -50,5 +52,20 @@ public class ProductValidator {
 		}
 
 		return phone;
+	}
+
+	public void validateProduct(ProductDTO dto, Product product) {
+
+		if (dto.keys.contains("name") && dto.name.equals(product.getName()) && !dto.name.equals("")) {
+			dto.keys.remove("name");
+		}
+
+		if (dto.keys.contains("price") && dto.price == product.getPrice()) {
+			dto.keys.remove("price");
+		}
+		if (dto.keys.contains("image") && dto.image.equals(product.getImage()) && !dto.image.equals("")) {
+			dto.keys.remove("image");
+		}
+
 	}
 }

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8"/>
+	<meta content="width=device-width, initial-scale=1" name="viewport"/>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+	<script th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js}"></script>
+	<script th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
+	<title>Home page</title>
+</head>
+
+<style>
+	#image {
+		height: 100px;
+		width: 130px;
+		display: block;
+	}
+</style>
+
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	var product = [[${product}]];
+	var fillings = [[${fillings}]];
+
+	$(document).ready(function () {
+
+		$("#pname").val(product.name);
+		$("#price").val(product.price);
+		$("#image").attr("src", product.image);
+		$("#image-input").val(product.image);
+
+		for (var key in fillings.content) {
+			var formCheck = document.createElement("div");
+			formCheck.setAttribute("class", "form-check");
+
+			var checkboxInput = document.createElement("input");
+			checkboxInput.setAttribute("type", "checkbox");
+			checkboxInput.setAttribute("id", "materialUnchecked");
+			checkboxInput.setAttribute("id", "fillings" + key);
+			checkboxInput.setAttribute("class", "form-check-input");
+
+			// setAttributes(checkboxInput, {
+			// 	"type": "checkbox",
+			// 	"class": "form-check-input",
+			// 	"id": "materialUnchecked",
+			// 	"id": "fillings" + key
+			// });
+
+			product.fillings.forEach( f => {
+				if (f.id === fillings.content[key].id) {
+					checkboxInput.checked = true;
+				}
+			});
+
+			var checkboxLabel = document.createElement("label");
+			setAttributes(checkboxInput, {"class": "form-check-label", "for": "materialUnchecked"});
+			checkboxLabel.innerHTML = fillings.content[key].name;
+
+			formCheck.appendChild(checkboxInput);
+			formCheck.appendChild(checkboxLabel);
+			document.getElementById("product-fillings").appendChild(formCheck);
+		}
+
+
+		$('#image-input').on('input', function () {
+			if (this.value) {
+				$("#image").attr("src", this.value);
+				$("#image").attr("src", this.value);
+			} else {
+				$("#image").attr("src", product.image);
+			}
+		});
+
+		$('#product-change-submit').on('click', function () {
+			var request = {
+				id: product.id,
+				name: $("#pname").val(),
+				price: $("#price").val(),
+				image: $("#image-input").val()
+			};
+
+			$.ajax({
+				url: "/v1/products?page=0&size=15",
+				contentType: "application/json",
+				method: "POST",
+				data: JSON.stringify(request),
+				dataType: 'json',
+				statusCode: {
+					204: function () {
+						alert("OK");
+					}
+				}
+			});
+		})
+	})
+
+	/*]]>*/
+
+	function setAttributes(el, attrs) {
+		for (var key in attrs) {
+			el.setAttribute(key, attrs[key]);
+		}
+	}
+</script>
+
+<body>
+<form>
+	<div class="form-group">
+		<label for="pname">Product name</label>
+		<input type="text" class="form-control" id="pname" aria-describedby="emailHelp">
+	</div>
+	<div class="form-group">
+		<label for="price">Price</label>
+		<input type="text" class="form-control" id="price" aria-describedby="emailHelp">
+	</div>
+	<div class="form-group">
+		<img src="#" id="image"/>
+		<label for="image-input">Image</label>
+		<input type="text" class="form-control" id="image-input"
+			   aria-describedby="emailHelp" placeholder="Enter image url">
+	</div>
+
+	<div id="product-fillings">
+
+	</div>
+
+	<button type="button" class="btn btn-primary" id="product-change-submit">Submit</button>
+</form>
+
+</body>
+</html>

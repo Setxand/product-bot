@@ -2,6 +2,8 @@ package com.productbot.service;
 
 import com.messanger.Element;
 import com.messanger.Messaging;
+import com.productbot.client.UrlProps;
+import com.productbot.dto.ProductDTO;
 import com.productbot.exceprion.BotException;
 import com.productbot.model.MessengerUser;
 import com.productbot.model.Product;
@@ -36,13 +38,15 @@ public class ProductService {
 	private final FillingRepository fillingRepo;
 	private final ProductRepository productRepo;
 	private final ProductHelperService productHelper;
+	private final UrlProps urlProps;
 
 	public ProductService(ProductValidator productValidator, FillingRepository fillingRepo,
-						  ProductRepository productRepo) {
+						  ProductRepository productRepo, UrlProps urlProps) {
 		this.productValidator = productValidator;
 		this.fillingRepo = fillingRepo;
 		this.productRepo = productRepo;
-		this.productHelper = new ProductHelperService(productValidator, productRepo);
+		this.urlProps = urlProps;
+		this.productHelper = new ProductHelperService(productValidator, productRepo, urlProps);
 	}
 
 	public String getProductFillingsAsString() {
@@ -99,6 +103,10 @@ public class ProductService {
 		return fillingRepo.findById(fillingId).orElseThrow(() -> new IllegalArgumentException("Invalid filling ID"));
 	}
 
+	public List<ProductFilling> getFillingsById(List<String> ids) {
+		return fillingRepo.findAllByIdIn(ids);
+	}
+
 	@Transactional
 	public Product productCreated(Messaging messaging) {
 		Product product = productRepo.findByMetaInfAndIsOwn(messaging.getSender().getId().toString(), false);
@@ -151,5 +159,23 @@ public class ProductService {
 	@Transactional
 	public void deleteProduct(String productId) {
 		productRepo.deleteById(productId);
+	}
+
+	@Transactional
+	public void updateProduct(ProductDTO dto) {
+		Product product = getProduct(dto.id);
+		productValidator.validateProduct(dto, product);
+
+		if (dto.keys.contains("name")) {
+			product.setName(dto.name);
+		}
+
+		if (dto.keys.contains("price")) {
+			product.setPrice(dto.price);
+		}
+
+		if (dto.keys.contains("image")) {
+			product.setImage(dto.image);
+		}
 	}
 }

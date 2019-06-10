@@ -1,6 +1,5 @@
 package com.productbot.service.curtain;
 
-import com.messanger.Button;
 import com.messanger.Messaging;
 import com.messanger.UserData;
 import com.productbot.client.UrlProps;
@@ -112,10 +111,5 @@ public class CurtainPostbackParser {
 	public void getOrder(Messaging messaging) {
 		String questionPayload = PayloadUtils.reformPayloadForQuestion(messaging.getPostback().getPayload());
 		messengerClient.sendSimpleQuestion(questionPayload, messaging, "Are you sure you want to get this order?");
-	}
-
-	public void updateProcess(Messaging messaging) {
-		messengerClient.sendPostbackButtons(messaging, "Click to update",
-				new Button("Update").urlButton(urlProps.getMap().get("server") + "/v1/products").webView());
 	}
 }

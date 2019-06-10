@@ -3,6 +3,7 @@ package com.productbot.service;
 import com.messanger.Button;
 import com.messanger.Element;
 import com.messanger.Messaging;
+import com.productbot.client.UrlProps;
 import com.productbot.model.Product;
 import com.productbot.repository.ProductRepository;
 import com.productbot.utils.PayloadUtils;
@@ -20,10 +21,12 @@ public class ProductHelperService {
 
 	private final ProductValidator productValidator;
 	private final ProductRepository productRepo;
+	private final UrlProps urlProps;
 
-	public ProductHelperService(ProductValidator productValidator, ProductRepository productRepo) {
+	public ProductHelperService(ProductValidator productValidator, ProductRepository productRepo, UrlProps urlProps) {
 		this.productValidator = productValidator;
 		this.productRepo = productRepo;
+		this.urlProps = urlProps;
 	}
 
 	void setProductName(Messaging messaging) {
@@ -60,8 +63,8 @@ public class ProductHelperService {
 
 			case UPDATE:
 				return new Button[]{
-						new Button("Update",
-								PayloadUtils.createPayloadWithParams(UPDATE_PROCESS_PAYLOAD.name(), productId)),
+						new Button("Update")
+								.urlButton(urlProps.getMap().get("server") + "/v1/products/" + productId).webView(),
 						new Button("Delete",
 								PayloadUtils.createPayloadWithParams(DELETE_PRODUCT_PAYLOAD.name(), productId))};
 
