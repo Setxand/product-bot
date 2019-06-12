@@ -33,18 +33,23 @@ public class ViewController {
 				.collect(Collectors.toList());
 
 		Page<FillingDTO> fillingsPage = productService.getProductFillings(pageable).map(DtoUtils::filling);
-
 		model.addAttribute("fillings", fillingsPage);
 		model.addAttribute("product", dto);
 		return "index";
 	}
 
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@PostMapping("/v1/products")
+	@PutMapping("/v1/products")
 	public void uopdateProduct(@RequestBody Map<String, Object> map) {
 		ProductDTO dto = objectMapper.convertValue(map, ProductDTO.class);
 		dto.keys = map.keySet();
 		productService.updateProduct(dto);
+	}
+
+	@GetMapping("/v1/fillings")
+	@ResponseBody
+	public Page<FillingDTO> getFillings(Pageable pageable) {
+		return productService.getProductFillings(pageable).map(DtoUtils::filling);
 	}
 
 }

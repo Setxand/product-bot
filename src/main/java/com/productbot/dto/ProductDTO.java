@@ -10,6 +10,7 @@ public class ProductDTO {
 	public String image;
 	public float price;
 	public List<FillingDTO> fillings;
+	public List<String> fillingsRequestData;
 
 	public Set<String> keys;
 

@@ -15,74 +15,107 @@
 		width: 130px;
 		display: block;
 	}
+
+	#product-fillings {
+		display: grid;
+		grid-template-columns: 90px 90px 90px;
+		grid-template-rows: 40px 40px;
+		grid-gap: 2rem;
+		margin: 40px;
+		justify-content: center;
+		align-content: start;
+	}
 </style>
 
 <script th:inline="javascript">
 	/*<![CDATA[*/
-	var product = [[${product}]];
-	var fillings = [[${fillings}]];
+	const product = [[${product}]];
+	const fillings = [[${fillings}]];
+	let fillingsRequestData = [];
 
-	$(document).ready(function () {
+	const checkFilling = id => fillingsRequestData.push(id);
 
-		$("#pname").val(product.name);
-		$("#price").val(product.price);
-		$("#image").attr("src", product.image);
-		$("#image-input").val(product.image);
+	const checkboxLabelClick = id => document.getElementById(id).checked = true;
 
-		for (var key in fillings.content) {
-			var formCheck = document.createElement("div");
+	const setAttributes = (el, attrs) => {
+		for (var key in attrs) {
+			el.setAttribute(key, attrs[key]);
+		}
+	};
+
+	const addFillings = fillings => {
+		for (let key in fillings.content) {
+
+			const formCheck = document.createElement("div");
 			formCheck.setAttribute("class", "form-check");
 
-			var checkboxInput = document.createElement("input");
-			checkboxInput.setAttribute("type", "checkbox");
-			checkboxInput.setAttribute("id", "materialUnchecked");
-			checkboxInput.setAttribute("id", "fillings" + key);
-			checkboxInput.setAttribute("class", "form-check-input");
+			const checkboxInput = document.createElement("input");
+			setAttributes(checkboxInput, {
+				"type": "checkbox",
+				"class": "form-check-input",
+				"onclick": "checkFilling('" + fillings.content[key].id + "')"
+			});
 
-			// setAttributes(checkboxInput, {
-			// 	"type": "checkbox",
-			// 	"class": "form-check-input",
-			// 	"id": "materialUnchecked",
-			// 	"id": "fillings" + key
-			// });
-
-			product.fillings.forEach( f => {
+			product.fillings.forEach(f => {
 				if (f.id === fillings.content[key].id) {
 					checkboxInput.checked = true;
 				}
 			});
 
-			var checkboxLabel = document.createElement("label");
-			setAttributes(checkboxInput, {"class": "form-check-label", "for": "materialUnchecked"});
+			const checkboxLabel = document.createElement("label");
+			setAttributes(checkboxLabel, {
+				"class": "form-check-label", "for": fillings.content[key].id,
+			});
+
 			checkboxLabel.innerHTML = fillings.content[key].name;
 
 			formCheck.appendChild(checkboxInput);
 			formCheck.appendChild(checkboxLabel);
+
 			document.getElementById("product-fillings").appendChild(formCheck);
 		}
 
+		const fillingsElement = document.getElementById("product-fillings");
 
-		$('#image-input').on('input', function () {
-			if (this.value) {
-				$("#image").attr("src", this.value);
-				$("#image").attr("src", this.value);
-			} else {
-				$("#image").attr("src", product.image);
+		const buttonNext = document.createElement("button");
+		buttonNext.innerHTML = "Next";
+		let nextNumber = fillings.number + 1;
+		buttonNext.setAttribute("onclick", "requestFillings('" + nextNumber + "')");
+		if (!fillings.last) fillingsElement.appendChild(buttonNext);
+
+		const buttonPrev = document.createElement("button");
+		buttonPrev.innerHTML = "Previous";
+		buttonPrev.setAttribute("onclick", "requestFillings('" + fillings.number - 1 + "')");
+		if (!fillings.first) fillingsElement.appendChild(buttonPrev);
+	};
+
+	function requestFillings(page) {
+		$.ajax({
+			url: "/v1/fillings?size=15&page=" + page,
+			method: "GET",
+			success: function (obj) {
+				const fillingsNode = document.getElementById("product-fillings");
+				fillingsNode.innerHTML = "";
+				addFillings(obj);
 			}
 		});
+	}
 
-		$('#product-change-submit').on('click', function () {
+	$(document).ready(() => {
+
+		$('#product-change-submit').on('click', () => {
 			var request = {
 				id: product.id,
 				name: $("#pname").val(),
 				price: $("#price").val(),
-				image: $("#image-input").val()
+				image: $("#image-input").val(),
+				fillingsRequestData: fillingsRequestData
 			};
 
 			$.ajax({
 				url: "/v1/products?page=0&size=15",
 				contentType: "application/json",
-				method: "POST",
+				method: "PUT",
 				data: JSON.stringify(request),
 				dataType: 'json',
 				statusCode: {
@@ -91,41 +124,51 @@
 					}
 				}
 			});
-		})
-	})
+		});
 
+		$('#image-input').on("input", function () {
+			if (this.value) {
+				$("#image").attr("src", this.value);
+
+			} else {
+				$("#image").attr("src", product.image);
+			}
+		});
+
+		$("#pname").val(product.name);
+		$("#price").val(product.price);
+		$("#image").attr("src", product.image);
+		$("#image-input").val(product.image);
+		addFillings(fillings);
+	});
 	/*]]>*/
-
-	function setAttributes(el, attrs) {
-		for (var key in attrs) {
-			el.setAttribute(key, attrs[key]);
-		}
-	}
 </script>
 
+
 <body>
-<form>
-	<div class="form-group">
-		<label for="pname">Product name</label>
-		<input type="text" class="form-control" id="pname" aria-describedby="emailHelp">
-	</div>
-	<div class="form-group">
-		<label for="price">Price</label>
-		<input type="text" class="form-control" id="price" aria-describedby="emailHelp">
-	</div>
-	<div class="form-group">
-		<img src="#" id="image"/>
-		<label for="image-input">Image</label>
-		<input type="text" class="form-control" id="image-input"
-			   aria-describedby="emailHelp" placeholder="Enter image url">
-	</div>
+<div class="container">
+	<form>
+		<div class="form-group">
+			<label for="pname">Product name</label>
+			<input type="text" class="form-control" id="pname" aria-describedby="emailHelp">
+		</div>
+		<div class="form-group">
+			<label for="price">Price</label>
+			<input type="text" class="form-control" id="price" aria-describedby="emailHelp">
+		</div>
+		<div class="form-group">
+			<img src="#" id="image"/>
+			<label for="image-input">Image</label>
+			<input type="text" class="form-control" id="image-input"
+				   aria-describedby="emailHelp" placeholder="Enter image url">
+		</div>
 
-	<div id="product-fillings">
+		<div id="product-fillings">
 
-	</div>
+		</div>
 
-	<button type="button" class="btn btn-primary" id="product-change-submit">Submit</button>
-</form>
-
+		<button type="button" class="btn btn-primary" id="product-change-submit">Submit</button>
+	</form>
+</div>
 </body>
 </html>

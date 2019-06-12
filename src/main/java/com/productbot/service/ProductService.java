@@ -177,5 +177,9 @@ public class ProductService {
 		if (dto.keys.contains("image")) {
 			product.setImage(dto.image);
 		}
+
+		if (dto.keys.contains("fillingsRequestData")) {
+			product.setFillings(dto.fillingsRequestData);
+		}
 	}
 }
