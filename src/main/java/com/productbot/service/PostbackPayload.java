@@ -2,7 +2,7 @@ package com.productbot.service;
 
 public enum PostbackPayload {
 	///common
-	CT_FILLING_PAYLOAD,
+	FILLING_ACTION_PAYLOAD,
 	CT_PRODUCT_PAYLOAD,
 	NAVI_PAYLOAD,
 	GET_STARTED_PAYLOAD,

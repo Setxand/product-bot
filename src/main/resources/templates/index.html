@@ -33,6 +33,25 @@
 	const fillings = [[${fillings}]];
 	let fillingsRequestData = [];
 
+
+	function requestFillings(page) {
+		$.ajax({
+			url: "/v1/fillings?size=15&page=" + page,
+			method: "GET",
+			success: function (obj) {
+				const fillings = document.getElementById("product-fillings");
+				while (fillings.firstChild) {
+					fillings.removeChild(fillings.firstChild);
+					console.log("removed")
+				}
+
+
+				// addFillings(obj);
+			}
+		});
+	}
+
+
 	const checkFilling = id => fillingsRequestData.push(id);
 
 	const checkboxLabelClick = id => document.getElementById(id).checked = true;
@@ -85,23 +104,23 @@
 
 		const buttonPrev = document.createElement("button");
 		buttonPrev.innerHTML = "Previous";
-		buttonPrev.setAttribute("onclick", "requestFillings('" + fillings.number - 1 + "')");
+		buttonPrev.setAttribute("onclick", "requestFillings('" + (fillings.number - 1) + "')");
 		if (!fillings.first) fillingsElement.appendChild(buttonPrev);
 	};
 
-	function requestFillings(page) {
-		$.ajax({
-			url: "/v1/fillings?size=15&page=" + page,
-			method: "GET",
-			success: function (obj) {
-				const fillingsNode = document.getElementById("product-fillings");
-				fillingsNode.innerHTML = "";
-				addFillings(obj);
-			}
-		});
-	}
-
 	$(document).ready(() => {
+
+
+		(function (d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) {
+				return;
+			}
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "//connect.facebook.net/en_US/messenger.Extensions.js";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'Messenger'));
 
 		$('#product-change-submit').on('click', () => {
 			var request = {
@@ -113,14 +132,20 @@
 			};
 
 			$.ajax({
-				url: "/v1/products?page=0&size=15",
+				url: "/v1/products",
 				contentType: "application/json",
 				method: "PUT",
 				data: JSON.stringify(request),
 				dataType: 'json',
 				statusCode: {
 					204: function () {
-						alert("OK");
+						// the Messenger Extensions JS SDK is done loading
+						MessengerExtensions.requestCloseBrowser(function success() {
+							// webview closed
+						}, function error(err) {
+							// an error occurred
+						});
+
 					}
 				}
 			});
@@ -141,6 +166,8 @@
 		$("#image-input").val(product.image);
 		addFillings(fillings);
 	});
+
+
 	/*]]>*/
 </script>
 

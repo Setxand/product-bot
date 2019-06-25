@@ -109,7 +109,8 @@ public class CourierService {
 	}
 
 	private String createOrderingString(ProductBucket bucket, MessengerUser user) {
-		return "\nname: " + user.getFirstName() + " " + user.getLastName() + "\nphone: " + bucket.getPhone() +
+		return "\nname: " + user.getFirstName() + " " + user.getLastName() + "\nprice: " + bucket.getPrice() +
+				"\nphone: " + bucket.getPhone() +
 				"\nProducts: " + bucket.getProducts().stream().map(p -> productService.getProduct(p).getName())
 				.collect(Collectors.joining(",")) +
 				"\n\nlocation: \n" + bucket.getLocation();

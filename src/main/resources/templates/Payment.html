@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+	<script th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js}"></script>
+	<script th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
+	<title>Stripe payment</title>
+
+</head>
+<body>
+
+<form action="/charge" method="POST">
+	<script src="https://checkout.stripe.com/checkout.js"></script>
+
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		(function (d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) {
+				return;
+			}
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "//connect.facebook.net/en_US/messenger.Extensions.js";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'Messenger'));
+
+		const userId = [[${userId}]];
+		let orderPrice = [[${price}]];
+		orderPrice *= 100;
+
+		const handler = StripeCheckout.configure({
+			key: 'pk_test_8HuDnTYLb2qD43FKLsCcdhom',
+			image: 'https://www.lviv-croissants.com/wp-content/themes/croissants/img/ing-m1.png',
+			locale: 'auto',
+			token: function (token) {
+
+				$.ajax({
+					method: 'POST',
+					url: '/v1/charges?stripeToken=' + token.id + '&price=' + orderPrice + '&userId=' + userId,
+					statusCode: {
+						201: function () {
+							// the Messenger Extensions JS SDK is done loading
+							MessengerExtensions.requestCloseBrowser(function success() {
+								// webview closed
+							}, function error(err) {
+								// an error occurred
+							});
+
+						}
+					}
+
+
+				});
+			}
+		});
+
+
+		handler.open({
+			name: 'Lviv - croissants - bot',
+			description: 'Fill the form below:',
+			amount: orderPrice
+		});
+
+		window.addEventListener('popstate', function () {
+			handler.close();
+		});
+		/*]]>*/
+	</script>
+</form>
+<div id="result"></div>
+
+</body>
+</html>

@@ -32,8 +32,8 @@ public class CurtainProcessor implements Processor {
 					postbackParser.navigation(messaging);
 					break;
 
-				case CT_FILLING_PAYLOAD:
-					postbackParser.createFilling(messaging);
+				case FILLING_ACTION_PAYLOAD:
+					postbackParser.fillingActions(messaging);
 					break;
 
 				case NEXT_PROD_PAYLOAD:
@@ -103,6 +103,14 @@ public class CurtainProcessor implements Processor {
 
 			case QUESTION_PAYLOAD:
 				questionPayload(messaging);
+				break;
+
+			case CREATE_FILLING_PAYLOAD:
+				curtainQuickReplyParser.createFilling(messaging);
+				break;
+
+			case DELETE_FILLING_PAYLOAD:
+				curtainQuickReplyParser.deleteFilling(messaging);
 				break;
 
 			default:

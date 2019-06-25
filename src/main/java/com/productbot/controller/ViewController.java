@@ -52,4 +52,10 @@ public class ViewController {
 		return productService.getProductFillings(pageable).map(DtoUtils::filling);
 	}
 
+	@GetMapping("/v1/products/{price}/card-payment")
+	public String payment(Model model, @PathVariable String price, @RequestParam String userId) {
+		model.addAttribute("price", price);
+		model.addAttribute("userId", userId);
+		return "Payment";
+	}
 }

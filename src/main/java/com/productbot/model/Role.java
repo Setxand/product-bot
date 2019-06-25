@@ -14,7 +14,7 @@ public enum Role {
 	USER(new Button("Menu", MENU_PAYLOAD.name()),
 			new Button("Create own product", CREATE_OWN_PAYLOAD.name())),
  
-	PERSONAL(new Button("Create filling", CT_FILLING_PAYLOAD.name()),
+	PERSONAL(new Button("Filling actions", FILLING_ACTION_PAYLOAD.name()),
 			new Button("Create product", CT_PRODUCT_PAYLOAD.name()),
 			new Button("Update product", UPDATE_PRODUCT_PAYLOAD.name())),
 

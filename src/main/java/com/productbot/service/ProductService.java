@@ -182,4 +182,8 @@ public class ProductService {
 			product.setFillings(dto.fillingsRequestData);
 		}
 	}
+
+	public void deleteFilling(String fillingId) {
+		fillingRepo.deleteById(fillingId);
+	}
 }

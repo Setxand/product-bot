@@ -35,8 +35,9 @@ public class CommonPostbackParser {
 		Long id = messaging.getSender().getId();
 		String userFirstName = userService.createUser(messengerClient
 				.getFacebookUserInfo(id, messaging.getPlatform()), id, messaging.getPlatform()).getFirstName();
-
 		messengerClient.helloMessage(userFirstName, messaging);
+		messengerClient
+				.sendGenericTemplate(productService.getMenuElements(0, ProductService.MenuType.ORDER), messaging);
 	}
 
 	@Transactional

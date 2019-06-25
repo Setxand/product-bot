@@ -1,6 +1,7 @@
 package com.productbot.service.curtain;
 
 import com.messanger.Messaging;
+import com.messanger.QuickReply;
 import com.messanger.UserData;
 import com.productbot.client.UrlProps;
 import com.productbot.client.curtain.CurtainMessengerClient;
@@ -70,11 +71,10 @@ public class CurtainPostbackParser {
 	}
 
 	@Transactional
-	public void createFilling(Messaging messaging) {
-		MessengerUser user = userService.setUserStatus(messaging, MessengerUser.UserStatus.CREATE_FILLING1);
-
-		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
-				.getString(MessengerUser.UserStatus.CREATE_FILLING1.name()), messaging);
+	public void fillingActions(Messaging messaging) {
+		messengerClient.sendQuickReplies("Filling actions:", messaging,
+				new QuickReply("Create filling", CurtainQuickReplyParser.QuickReplyPayload.CREATE_FILLING_PAYLOAD.name()),
+				new QuickReply("Delete filling", CurtainQuickReplyParser.QuickReplyPayload.DELETE_FILLING_PAYLOAD.name()));
 	}
 
 	public void orderingList(Messaging messaging) {

@@ -26,7 +26,8 @@ public class MessengerUser {
 		ORDERING1,
 		ORDERING2,
 		ORDERING3,
-		SETTING_ROLE1
+		SETTING_ROLE1,
+		DEL_FILLING
 
 	}
 

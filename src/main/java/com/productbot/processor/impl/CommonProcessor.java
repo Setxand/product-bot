@@ -85,6 +85,14 @@ public class CommonProcessor implements Processor {
 					questionPayload(messaging);
 					break;
 
+				case CASH_PAYLOAD:
+					quickReplyParser.cashPayment(messaging);
+					break;
+
+				case CARD_PAYLOAD:
+					quickReplyParser.cardPayment(messaging);
+					break;
+
 				default:
 					throw new BotException(messaging);
 			}

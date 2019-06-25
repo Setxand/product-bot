@@ -61,7 +61,6 @@ public class ProductBucketService {
 	public void closeBucket(Messaging messaging) {
 		ProductBucket bucket = getBucket(messaging);
 		bucket.setOrderProcess(null);
-
 		courierService.publishBucket(messaging, bucket);
 	}
 
@@ -92,6 +91,13 @@ public class ProductBucketService {
 				.collect(Collectors.toList());
 	}
 
+	@Transactional
+	public void setBucketPrice(Messaging messaging) {
+		ProductBucket bucket = getBucket(messaging);
+		double sum = bucket.getProducts().stream().mapToDouble(p -> productService.getProduct(p).getPrice()).sum();
+		bucket.setPrice((float) sum);
+	}
+
 	private void ordering2(Messaging messaging) {
 		ProductBucket bucket = getBucket(messaging);
 		Attachment attachment = messaging.getMessage().getAttachments().get(0);
@@ -118,8 +124,13 @@ public class ProductBucketService {
 		}
 	}
 
-	private ProductBucket getBucket(Messaging messaging) {
+	public ProductBucket getBucket(Messaging messaging) {
 		return bucketRepo.findByUserIdAndOrderProcessIsTrue(messaging.getSender().getId()
 				.toString()).orElseThrow(() -> new BotException(messaging));
+	}
+
+	public ProductBucket getBucketById(String bucketId) {
+		return bucketRepo.findByUserIdAndOrderProcessIsTrue(bucketId)
+				.orElseThrow(() -> new IllegalArgumentException("invalid bucket ID"));
 	}
 }

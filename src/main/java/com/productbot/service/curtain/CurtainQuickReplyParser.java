@@ -2,11 +2,13 @@ package com.productbot.service.curtain;
 
 import com.messanger.Messaging;
 import com.productbot.client.curtain.CurtainMessengerClient;
+import com.productbot.exceprion.BotException;
 import com.productbot.model.MessengerUser;
 import com.productbot.model.Role;
 import com.productbot.service.CourierService;
 import com.productbot.service.ProductService;
 import com.productbot.service.UserService;
+import com.productbot.service.curtain.helper.CurtainQuickReplyHelper;
 import com.productbot.utils.PayloadUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,14 +29,18 @@ public class CurtainQuickReplyParser {
 		SET_ROLE_PAYLOAD,
 		PUBLISH_BUCKET,
 		DELETE_PRODUCT_PAYLOAD,
-		GET_ORDER_PAYLOAD
+		GET_ORDER_PAYLOAD,///todo set enum to service pac
+		CASH_PAYLOAD,
+		CARD_PAYLOAD,
+		CREATE_FILLING_PAYLOAD,
+		DELETE_FILLING_PAYLOAD
 	}
 
 	private final UserService userService;
 	private final ProductService productService;
 	private final CurtainMessengerClient messengerClient;
 	private final CourierService courierService;
-
+	private final CurtainQuickReplyHelper quickReplyHelper;
 
 	public CurtainQuickReplyParser(UserService userService, ProductService productService,
 								   CurtainMessengerClient messengerClient, CourierService courierService) {
@@ -42,30 +48,32 @@ public class CurtainQuickReplyParser {
 		this.productService = productService;
 		this.messengerClient = messengerClient;
 		this.courierService = courierService;
+		quickReplyHelper = new CurtainQuickReplyHelper(userService, messengerClient, productService);
 	}
 
 	@Transactional
 	public void commonPayload(Messaging messaging) {
 		MessengerUser user = userService.getUser(messaging.getSender().getId());
 
-		if (user.getStatus() == MessengerUser.UserStatus.CREATE_PROD3) {
-			productService.addProdFilling(messaging);
+		String payload = messaging.getMessage().getQuickReply().getPayload();
+		String[] params = PayloadUtils.getParams(payload);
 
-			int firstEl = Integer.parseInt(PayloadUtils
-					.getParams(messaging.getMessage().getQuickReply().getPayload())[1]);
+		switch (user.getStatus()) {
+			case CREATE_PROD3:
+				quickReplyHelper.createProd3(messaging, params, user.getStatus());
+				break;
 
-			String text = ResourceBundle.getBundle("dialog").getString(user.getStatus().name());
-			messengerClient.sendFillingsAsQuickReplies(text, messaging, productService
-					.getProductFillings(PageRequest.of(firstEl, 8)), firstEl);
+			case SETTING_ROLE1:
+				quickReplyHelper.settingRole1(messaging, params, user);
+				break;
 
-		} else if (user.getStatus() == MessengerUser.UserStatus.SETTING_ROLE1) {
-			String contextId = PayloadUtils.getParams(messaging.getMessage().getQuickReply().getPayload())[0];
-			MessengerUser contextUser = userService.getUser(Long.parseLong(contextId));
-			user.setAdminMetaInfo(contextUser.getId().toString());
+			case DEL_FILLING:
+				quickReplyHelper.delFilling(messaging, params);
+				break;
 
-			messengerClient.sendRoleQuickReplies("Enter role for " + contextUser.getFirstName() + ": ", messaging);
+			default:
+				throw new BotException(messaging, "This feature is not implemented yet");
 		}
-
 	}
 
 	public void swipeButtons(Messaging messaging, boolean next) {////todo staff related to user list on role settings
@@ -118,6 +126,14 @@ public class CurtainQuickReplyParser {
 
 	}
 
+	@Transactional
+	public void createFilling(Messaging messaging) {
+		MessengerUser user = userService.setUserStatus(messaging, MessengerUser.UserStatus.CREATE_FILLING1);
+
+		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
+				.getString(MessengerUser.UserStatus.CREATE_FILLING1.name()), messaging);
+	}
+
 	public void deleteProduct(Messaging messaging, String payload) {
 		String[] params = PayloadUtils.getParams(payload);
 
@@ -142,6 +158,14 @@ public class CurtainQuickReplyParser {
 		} else {
 			declined(messaging);
 		}
+	}
+
+	@Transactional
+	public void deleteFilling(Messaging messaging) {
+		userService.setUserStatus(messaging, MessengerUser.UserStatus.DEL_FILLING);
+		messengerClient
+				.sendFillingsForDelete("Choose filling to delete: ",
+						messaging, productService.getProductFillings(PageRequest.of(0, 8)), 0);
 	}
 
 	private void declined(Messaging messaging) {

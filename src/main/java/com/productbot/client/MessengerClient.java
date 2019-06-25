@@ -22,7 +22,8 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 
 	public enum AdditionalButtonCases {
 		USERS,
-		FILLINGS
+		FILLINGS,
+		DEL_FILLINGS
 	}
 
 	public MessengerClient(UrlProps urlProps) {
@@ -59,12 +60,21 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 
 	public void sendFillingsAsQuickReplies(String text, Messaging messaging,
 										   Page<ProductFilling> fillingList, int firstEl) {
+		sendFillings(text, messaging, fillingList, firstEl, AdditionalButtonCases.FILLINGS);
+	}
 
+	public void sendFillingsForDelete(String text, Messaging messaging,
+										   Page<ProductFilling> fillingList, int firstEl) {
+		sendFillings(text, messaging, fillingList, firstEl, AdditionalButtonCases.DEL_FILLINGS);
+	}
+
+	private void sendFillings(String text, Messaging messaging, Page<ProductFilling> fillingList, int firstEl,
+							  AdditionalButtonCases buttonCase) {
 		List<QuickReply> list = fillingList.stream()
 				.map(f -> new QuickReply(f.getName(), PayloadUtils.createPayloadWithParams(COMMON_Q_PAYLOAD.name(),
 						String.valueOf(f.getId()), String.valueOf(firstEl)))).collect(toList());
 
-		additionalButtons(list, firstEl, fillingList.getTotalPages() - 1, AdditionalButtonCases.FILLINGS);
+		additionalButtons(list, firstEl, fillingList.getTotalPages() - 1, buttonCase);
 		sendQuickReplies(text, messaging, list.toArray(new QuickReply[0]));
 	}
 

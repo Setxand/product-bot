@@ -21,6 +21,7 @@ public class ProductBucket {
 	private String id;
 	private String userId;
 	private String phone;
+	private float price;
 
 	@Column(length = 510)
 	private String location;

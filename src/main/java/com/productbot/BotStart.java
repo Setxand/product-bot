@@ -65,7 +65,7 @@ public class BotStart {
 	}
 
 	@Component
-	class ContextRefresh implements ApplicationListener<ApplicationReadyEvent> {
+	class ApplicationReady implements ApplicationListener<ApplicationReadyEvent> {
 
 		@Override
 		public void onApplicationEvent(ApplicationReadyEvent event) {
