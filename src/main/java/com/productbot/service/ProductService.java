@@ -100,7 +100,11 @@ public class ProductService {
 	}
 
 	public ProductFilling getFilling(String fillingId) {
-		return fillingRepo.findById(fillingId).orElseThrow(() -> new IllegalArgumentException("Invalid filling ID"));
+		return fillingRepo.findById(fillingId).orElseGet(() -> {
+			ProductFilling productFilling = new ProductFilling();
+			productFilling.setName("Deleted filling");
+			return productFilling;
+		});
 	}
 
 	public List<ProductFilling> getFillingsById(List<String> ids) {

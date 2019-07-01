@@ -30,8 +30,7 @@ public class PostbackHelper {
 		this.eventPublisher = eventPublisher;
 	}
 
-	public void createProd(Messaging messaging, MessengerUser.UserStatus nextStatus) {
-		MessengerUser user = userService.getUser(messaging.getSender().getId());
+	public void createProd(Messaging messaging, MessengerUser user, MessengerUser.UserStatus nextStatus) {
 		productService.createProduct(messaging, user.getStatus());
 		userService.setUserStatus(messaging, nextStatus);
 

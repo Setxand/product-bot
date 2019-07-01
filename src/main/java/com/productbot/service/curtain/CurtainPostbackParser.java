@@ -5,7 +5,6 @@ import com.messanger.QuickReply;
 import com.messanger.UserData;
 import com.productbot.client.UrlProps;
 import com.productbot.client.curtain.CurtainMessengerClient;
-import com.productbot.model.MessengerUser;
 import com.productbot.service.PostbackPayload;
 import com.productbot.service.ProductBucketService;
 import com.productbot.service.ProductService;
@@ -15,7 +14,6 @@ import com.productbot.utils.PayloadUtils;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ResourceBundle;
 
 import static com.productbot.model.MessengerUser.UserStatus.SETTING_ROLE1;
 import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.QUESTION_PAYLOAD;
@@ -44,20 +42,6 @@ public class CurtainPostbackParser {
 		messengerClient.sendSimpleMessage("Enter name of user: ", messaging);
 	}
 
-	@Transactional
-	public void createProduct(Messaging messaging) {
-		MessengerUser user = userService.getUser(messaging.getSender().getId());
-
-		if (user.getStatus() != null) {
-			productService.createProduct(messaging, user.getStatus());
-			return;
-		}
-
-		userService.setUserStatus(messaging, MessengerUser.UserStatus.CREATE_PROD1);
-		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
-				.getString(MessengerUser.UserStatus.CREATE_PROD1.name()), messaging);
-	}
-
 	public void getStarted(Messaging messaging) {
 		UserData userData = DtoUtils.user(userService.createUser(
 				messengerClient.getFacebookUserInfo(messaging.getSender().getId(),
@@ -79,11 +63,6 @@ public class CurtainPostbackParser {
 
 	public void orderingList(Messaging messaging) {
 		messengerClient.sendGenericTemplate(productBucketService.getOrderingList(0), messaging);
-	}
-
-	public void updateProduct(Messaging messaging) {
-		messengerClient.sendGenericTemplate(productService.getMenuElements(0, ProductService.MenuType.UPDATE),
-				messaging);
 	}
 
 	public void switchMenu(Messaging messaging) {
@@ -111,5 +90,11 @@ public class CurtainPostbackParser {
 	public void getOrder(Messaging messaging) {
 		String questionPayload = PayloadUtils.reformPayloadForQuestion(messaging.getPostback().getPayload());
 		messengerClient.sendSimpleQuestion(questionPayload, messaging, "Are you sure you want to get this order?");
+	}
+
+	public void productActions(Messaging messaging) {
+		messengerClient.sendQuickReplies("Choose actions:", messaging,
+				new QuickReply("Create product", CurtainQuickReplyParser.QuickReplyPayload.CT_PRODUCT_PAYLOAD.name()),
+				new QuickReply("Update product", CurtainQuickReplyParser.QuickReplyPayload.UPDATE_PRODUCT_PAYLOAD.name()));
 	}
 }

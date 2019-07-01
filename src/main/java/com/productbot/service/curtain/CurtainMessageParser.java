@@ -36,7 +36,7 @@ public class CurtainMessageParser {
 
 	@Transactional
 	public void messageByStatus(Messaging messaging) {
-		MessengerUser user = userService.getUser(messaging.getSender().getId());///todo set user in each function which calls user from database
+		MessengerUser user = userService.getUser(messaging.getSender().getId());
 		if (user.getStatus() == null) throw new BotException(messaging, "The best practice is to use navigation");
 
 		switch (user.getStatus()) {
@@ -46,15 +46,15 @@ public class CurtainMessageParser {
 				break;
 
 			case CREATE_PROD1:
-				postbackHelper.createProd(messaging, CREATE_PROD2);
+				postbackHelper.createProd(messaging, user, CREATE_PROD2);
 				break;
 
 			case CREATE_PROD2:
-				postbackHelper.createProd(messaging, CREATE_PROD3);
+				postbackHelper.createProd(messaging, user, CREATE_PROD3);
 				break;
 
 			case CREATE_PROD4:
-				postbackHelper.createProd(messaging, CREATE_PROD5);
+				postbackHelper.createProd(messaging, user, CREATE_PROD5);
 				break;
 
 			case SETTING_ROLE1:

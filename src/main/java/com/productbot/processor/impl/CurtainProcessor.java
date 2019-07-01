@@ -28,6 +28,10 @@ public class CurtainProcessor implements Processor {
 			String payload = messaging.getPostback().getPayload();
 			switch (PostbackPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
 
+				case PRODUCT_ACTION_PAYLOAD:
+					postbackParser.productActions(messaging);
+					break;
+
 				case NAVI_PAYLOAD:
 					postbackParser.navigation(messaging);
 					break;
@@ -44,20 +48,12 @@ public class CurtainProcessor implements Processor {
 					postbackParser.switchMenu(messaging);
 					break;
 
-				case CT_PRODUCT_PAYLOAD:
-					postbackParser.createProduct(messaging);
-					break;
-
 				case SET_ROLE_PAYLOAD:
 					postbackParser.setRole(messaging);
 					break;
 
 				case ORDERINGS_LIST_PAYLOAD:
 					postbackParser.orderingList(messaging);
-					break;
-
-				case UPDATE_PRODUCT_PAYLOAD:
-					postbackParser.updateProduct(messaging);
 					break;
 
 				case DELETE_PRODUCT_PAYLOAD:
@@ -83,6 +79,14 @@ public class CurtainProcessor implements Processor {
 
 			case NEXT_Q_PAYLOAD:
 				curtainQuickReplyParser.swipeButtons(messaging, true);
+				break;
+
+			case CT_PRODUCT_PAYLOAD:
+				curtainQuickReplyParser.createProduct(messaging);
+				break;
+
+			case UPDATE_PRODUCT_PAYLOAD:
+				curtainQuickReplyParser.updateProduct(messaging);
 				break;
 
 			case COMMON_Q_PAYLOAD:
@@ -118,6 +122,16 @@ public class CurtainProcessor implements Processor {
 		}
 	}
 
+	@Override
+	public void passMessage(Messaging messaging) {
+		curtainMessageParser.messageByStatus(messaging);
+	}
+
+	@Override
+	public void getStartedAction(Messaging messaging) {
+		postbackParser.getStarted(messaging);
+	}
+
 	private void questionPayload(Messaging messaging) {
 		String payload = messaging.getMessage().getQuickReply().getPayload();
 		String questionContext = PayloadUtils.getParams(payload)[0];
@@ -136,19 +150,10 @@ public class CurtainProcessor implements Processor {
 				curtainQuickReplyParser.getOrder(messaging, payload);
 				break;
 
-				default: throw new BotException(messaging, "This feature hasn't been provided yet", payload);
+			default:
+				throw new BotException(messaging, "This feature hasn't been provided yet", payload);
 		}
 
 
-	}
-
-	@Override
-	public void passMessage(Messaging messaging) {
-		curtainMessageParser.messageByStatus(messaging);
-	}
-
-	@Override
-	public void getStartedAction(Messaging messaging) {
-		postbackParser.getStarted(messaging);
 	}
 }

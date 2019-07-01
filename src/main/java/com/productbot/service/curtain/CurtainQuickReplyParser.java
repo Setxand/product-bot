@@ -33,7 +33,9 @@ public class CurtainQuickReplyParser {
 		CASH_PAYLOAD,
 		CARD_PAYLOAD,
 		CREATE_FILLING_PAYLOAD,
-		DELETE_FILLING_PAYLOAD
+		DELETE_FILLING_PAYLOAD,
+		UPDATE_PRODUCT_PAYLOAD,
+		CT_PRODUCT_PAYLOAD,
 	}
 
 	private final UserService userService;
@@ -49,6 +51,25 @@ public class CurtainQuickReplyParser {
 		this.messengerClient = messengerClient;
 		this.courierService = courierService;
 		quickReplyHelper = new CurtainQuickReplyHelper(userService, messengerClient, productService);
+	}
+
+	@Transactional
+	public void createProduct(Messaging messaging) {
+		MessengerUser user = userService.getUser(messaging.getSender().getId());
+
+		if (user.getStatus() != null) {
+			productService.createProduct(messaging, user.getStatus());
+			return;
+		}
+
+		userService.setUserStatus(messaging, MessengerUser.UserStatus.CREATE_PROD1);
+		messengerClient.sendSimpleMessage(ResourceBundle.getBundle("dialog", user.getLocale())
+				.getString(MessengerUser.UserStatus.CREATE_PROD1.name()), messaging);
+	}
+
+	public void updateProduct(Messaging messaging) {
+		messengerClient.sendGenericTemplate(productService.getMenuElements(0, ProductService.MenuType.UPDATE),
+				messaging);
 	}
 
 	@Transactional
@@ -86,8 +107,12 @@ public class CurtainQuickReplyParser {
 
 		firstEl = next ? firstEl + 1 : firstEl - 1;
 
-		messengerClient.sendFillingsAsQuickReplies(text, messaging, productService
-				.getProductFillings(PageRequest.of(firstEl, 8)), firstEl);
+		if (user.getStatus() == MessengerUser.UserStatus.DEL_FILLING)
+			messengerClient.sendFillingsForDelete(text, messaging, productService
+					.getProductFillings(PageRequest.of(firstEl, 8)), firstEl);
+		 else
+			messengerClient.sendFillingsAsQuickReplies(text, messaging, productService
+					.getProductFillings(PageRequest.of(firstEl, 8)), firstEl);
 	}
 
 	@Transactional

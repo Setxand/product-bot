@@ -15,8 +15,7 @@ public enum Role {
 			new Button("Create own product", CREATE_OWN_PAYLOAD.name())),
  
 	PERSONAL(new Button("Filling actions", FILLING_ACTION_PAYLOAD.name()),
-			new Button("Create product", CT_PRODUCT_PAYLOAD.name()),
-			new Button("Update product", UPDATE_PRODUCT_PAYLOAD.name())),
+			new Button("Product actions", PRODUCT_ACTION_PAYLOAD.name())),
 
 
 	COURIER(new Button("Orderings list", ORDERINGS_LIST_PAYLOAD.name())),
