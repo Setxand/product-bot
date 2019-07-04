@@ -4,10 +4,10 @@ import com.messanger.Messaging;
 import com.productbot.exceprion.BotException;
 import com.productbot.processor.Processor;
 import com.productbot.service.PostbackPayload;
+import com.productbot.service.QuickReplyPayload;
 import com.productbot.service.common.CommonMessageParser;
 import com.productbot.service.common.CommonPostbackParser;
 import com.productbot.service.common.CommonQuickReplyParser;
-import com.productbot.service.curtain.CurtainQuickReplyParser;
 import com.productbot.utils.PayloadUtils;
 
 
@@ -79,7 +79,7 @@ public class CommonProcessor implements Processor {
 		if (payload.contains("+") && payload.length() == 13)
 			passMessage(messaging);
 		else
-			switch (CurtainQuickReplyParser.QuickReplyPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
+			switch (QuickReplyPayload.valueOf(PayloadUtils.getCommonPayload(payload))) {
 
 				case QUESTION_PAYLOAD:
 					questionPayload(messaging);

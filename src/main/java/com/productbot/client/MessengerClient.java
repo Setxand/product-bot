@@ -5,7 +5,7 @@ import com.messanger.Messaging;
 import com.messanger.QuickReply;
 import com.productbot.model.MessengerUser;
 import com.productbot.model.ProductFilling;
-import com.productbot.service.curtain.CurtainQuickReplyParser;
+import com.productbot.service.QuickReplyPayload;
 import com.productbot.utils.PayloadUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.COMMON_Q_PAYLOAD;
+import static com.productbot.service.QuickReplyPayload.COMMON_Q_PAYLOAD;
 import static java.util.stream.Collectors.toList;
 
 @Component
@@ -105,19 +105,19 @@ public class MessengerClient extends com.messanger.client.MessengerClient {
 								   AdditionalButtonCases buttonCase) {
 
 		if (buttonCase == AdditionalButtonCases.FILLINGS) {
-			list.add(new QuickReply("That`s it", CurtainQuickReplyParser.QuickReplyPayload.STOP_Q_PAYLOAD.name()));
+			list.add(new QuickReply("That`s it", QuickReplyPayload.STOP_Q_PAYLOAD.name()));
 		}
 
 		if (pageNumber > 0) {
 
 			list.add(0, new QuickReply(" <- previous",
-					PayloadUtils.createPayloadWithParams(CurtainQuickReplyParser.QuickReplyPayload
+					PayloadUtils.createPayloadWithParams(QuickReplyPayload
 							.PREV_Q_PAYLOAD.name(), String.valueOf(pageNumber))));
 		}
 
 		if (pageNumber < totalPages) {
-			list.add(new QuickReply("next -> ", PayloadUtils.createPayloadWithParams(CurtainQuickReplyParser.
-					QuickReplyPayload.NEXT_Q_PAYLOAD.name(), String.valueOf(pageNumber))));
+			list.add(new QuickReply("next -> ", PayloadUtils
+					.createPayloadWithParams(QuickReplyPayload.NEXT_Q_PAYLOAD.name(), String.valueOf(pageNumber))));
 		}
 	}
 }

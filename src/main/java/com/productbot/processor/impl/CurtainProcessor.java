@@ -4,6 +4,7 @@ import com.messanger.Messaging;
 import com.productbot.exceprion.BotException;
 import com.productbot.processor.Processor;
 import com.productbot.service.PostbackPayload;
+import com.productbot.service.QuickReplyPayload;
 import com.productbot.service.curtain.CurtainMessageParser;
 import com.productbot.service.curtain.CurtainPostbackParser;
 import com.productbot.service.curtain.CurtainQuickReplyParser;
@@ -56,6 +57,10 @@ public class CurtainProcessor implements Processor {
 					postbackParser.orderingList(messaging);
 					break;
 
+				case OWN_ORDERINGS_LIST_PAYLOAD:
+					postbackParser.ownOrderingList(messaging);
+					break;
+
 				case DELETE_PRODUCT_PAYLOAD:
 					postbackParser.deleteProduct(messaging);
 					break;
@@ -75,7 +80,7 @@ public class CurtainProcessor implements Processor {
 		String payloadWithAgrs = messaging.getMessage().getQuickReply().getPayload();
 		String commonPayload = PayloadUtils.getCommonPayload(payloadWithAgrs);
 
-		switch (CurtainQuickReplyParser.QuickReplyPayload.valueOf(commonPayload)) {
+		switch (QuickReplyPayload.valueOf(commonPayload)) {
 
 			case NEXT_Q_PAYLOAD:
 				curtainQuickReplyParser.swipeButtons(messaging, true);
@@ -136,7 +141,7 @@ public class CurtainProcessor implements Processor {
 		String payload = messaging.getMessage().getQuickReply().getPayload();
 		String questionContext = PayloadUtils.getParams(payload)[0];
 
-		switch (CurtainQuickReplyParser.QuickReplyPayload.valueOf(questionContext)) {
+		switch (QuickReplyPayload.valueOf(questionContext)) {
 
 			case PUBLISH_BUCKET:
 				curtainQuickReplyParser.courierAcceptance(messaging, payload);

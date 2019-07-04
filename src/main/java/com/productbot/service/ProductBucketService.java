@@ -1,6 +1,7 @@
 package com.productbot.service;
 
 import com.messanger.Attachment;
+import com.messanger.Button;
 import com.messanger.Element;
 import com.messanger.Messaging;
 import com.productbot.exceprion.BotException;
@@ -19,6 +20,8 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.productbot.service.PostbackPayload.GET_ORDER_PAYLOAD;
 
 @Service
 public class ProductBucketService {
@@ -73,8 +76,12 @@ public class ProductBucketService {
 		bucket.getProducts().add(productToAdd);
 	}
 
-	public List<Element> getOrderingList(int pageNumber) {
-		Page<ProductBucket> bucketPage = bucketRepo.findAllByAcceptedIsFalse(PageRequest.of(pageNumber, 10));
+	public List<Element> getOrderingList(Messaging messaging, int pageNumber, boolean own) {
+		Page<ProductBucket> bucketPage = own ?
+				bucketRepo.findAllByUserIdAndAcceptedIsTrue(messaging.getSender().getId().toString(),
+						PageRequest.of(pageNumber, 10)) :
+				bucketRepo.findAllByAcceptedIsFalse(PageRequest.of(pageNumber, 10));
+
 		List<ProductBucket> buckets = bucketPage.getContent();
 
 		Map<String, String> userNames = userService.listUsersByIds(buckets.stream().map(ProductBucket::getUserId)
@@ -87,7 +94,9 @@ public class ProductBucketService {
 				.map(productService::getProduct).map(Product::getName).collect(Collectors.toList())));
 
 		return buckets.stream()
-				.map(productBucket -> DtoUtils.orderingElement(productBucket, userNames, productMap))
+				.map(productBucket -> DtoUtils.orderingElement(productBucket, userNames, productMap, new Button("Get order",
+								PayloadUtils.createPayloadWithParams(GET_ORDER_PAYLOAD.name(), productBucket.getId())),
+						new Button("Location").urlButton(productBucket.getLocation())))
 				.collect(Collectors.toList());
 	}
 

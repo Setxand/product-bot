@@ -19,25 +19,6 @@ import java.util.ResourceBundle;
 @Service
 public class CurtainQuickReplyParser {
 
-	public enum QuickReplyPayload {
-
-		PREV_Q_PAYLOAD,
-		NEXT_Q_PAYLOAD,
-		COMMON_Q_PAYLOAD,
-		STOP_Q_PAYLOAD,
-		QUESTION_PAYLOAD,
-		SET_ROLE_PAYLOAD,
-		PUBLISH_BUCKET,
-		DELETE_PRODUCT_PAYLOAD,
-		GET_ORDER_PAYLOAD,///todo set enum to service pac
-		CASH_PAYLOAD,
-		CARD_PAYLOAD,
-		CREATE_FILLING_PAYLOAD,
-		DELETE_FILLING_PAYLOAD,
-		UPDATE_PRODUCT_PAYLOAD,
-		CT_PRODUCT_PAYLOAD,
-	}
-
 	private final UserService userService;
 	private final ProductService productService;
 	private final CurtainMessengerClient messengerClient;

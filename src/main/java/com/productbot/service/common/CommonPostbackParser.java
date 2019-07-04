@@ -5,8 +5,8 @@ import com.productbot.client.common.CommonMessengerClient;
 import com.productbot.model.MessengerUser;
 import com.productbot.service.ProductBucketService;
 import com.productbot.service.ProductService;
+import com.productbot.service.QuickReplyPayload;
 import com.productbot.service.UserService;
-import com.productbot.service.curtain.CurtainQuickReplyParser;
 import com.productbot.utils.PayloadUtils;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +51,7 @@ public class CommonPostbackParser {
 	public void addProduct(Messaging messaging) {
 		productBucketService.addProd(messaging);
 		String payload = PayloadUtils
-				.createPayloadWithParams(CurtainQuickReplyParser.QuickReplyPayload.QUESTION_PAYLOAD.name(),
+				.createPayloadWithParams(QuickReplyPayload.QUESTION_PAYLOAD.name(),
 						SOME_ELSE_CONTEXT.name());
 
 		MessengerUser user = userService.getUser(messaging.getSender().getId());

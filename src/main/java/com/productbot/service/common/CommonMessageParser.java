@@ -6,8 +6,8 @@ import com.productbot.exceprion.BotException;
 import com.productbot.model.MessengerUser;
 import com.productbot.service.ProductBucketService;
 import com.productbot.service.ProductService;
+import com.productbot.service.QuickReplyPayload;
 import com.productbot.service.UserService;
-import com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload;
 import com.productbot.utils.PayloadUtils;
 import org.springframework.stereotype.Service;
 

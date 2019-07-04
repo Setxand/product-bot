@@ -18,8 +18,8 @@ import javax.transaction.Transactional;
 import java.util.stream.Collectors;
 
 import static com.productbot.client.Platform.CURTAIN;
-import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.PUBLISH_BUCKET;
-import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.QUESTION_PAYLOAD;
+import static com.productbot.service.QuickReplyPayload.PUBLISH_BUCKET;
+import static com.productbot.service.QuickReplyPayload.QUESTION_PAYLOAD;
 
 @Service
 public class CourierService {

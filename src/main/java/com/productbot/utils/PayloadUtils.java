@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.QUESTION_PAYLOAD;
+import static com.productbot.service.QuickReplyPayload.QUESTION_PAYLOAD;
 
 public class PayloadUtils {
 

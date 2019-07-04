@@ -12,8 +12,8 @@ import com.productbot.service.UserService;
 import com.productbot.utils.PayloadUtils;
 import org.springframework.stereotype.Service;
 
-import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.CARD_PAYLOAD;
-import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.CASH_PAYLOAD;
+import static com.productbot.service.QuickReplyPayload.CARD_PAYLOAD;
+import static com.productbot.service.QuickReplyPayload.CASH_PAYLOAD;
 
 @Service
 public class CommonQuickReplyParser {

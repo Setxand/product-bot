@@ -13,4 +13,6 @@ public interface ProductBucketRepository extends JpaRepository<ProductBucket, St
 
 	Page<ProductBucket> findAllByAcceptedIsFalse(Pageable pageable);
 
+	Page<ProductBucket> findAllByUserIdAndAcceptedIsTrue(String userId, Pageable pageable);
+
 }

@@ -18,7 +18,8 @@ public enum Role {
 			new Button("Product actions", PRODUCT_ACTION_PAYLOAD.name())),
 
 
-	COURIER(new Button("Orderings list", ORDERINGS_LIST_PAYLOAD.name())),
+	COURIER(new Button("Orderings list", ORDERINGS_LIST_PAYLOAD.name()),
+			new Button("My ordering list", ORDERINGS_LIST_PAYLOAD.name())),
 
 	ADMIN(new Button("Set role", SET_ROLE_PAYLOAD.name()));
 

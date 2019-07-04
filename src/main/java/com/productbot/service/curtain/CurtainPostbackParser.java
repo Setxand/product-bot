@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 
 import static com.productbot.model.MessengerUser.UserStatus.SETTING_ROLE1;
-import static com.productbot.service.curtain.CurtainQuickReplyParser.QuickReplyPayload.QUESTION_PAYLOAD;
+import static com.productbot.service.QuickReplyPayload.*;
 
 @Service
 public class CurtainPostbackParser {
@@ -57,12 +57,12 @@ public class CurtainPostbackParser {
 	@Transactional
 	public void fillingActions(Messaging messaging) {
 		messengerClient.sendQuickReplies("Filling actions:", messaging,
-				new QuickReply("Create filling", CurtainQuickReplyParser.QuickReplyPayload.CREATE_FILLING_PAYLOAD.name()),
-				new QuickReply("Delete filling", CurtainQuickReplyParser.QuickReplyPayload.DELETE_FILLING_PAYLOAD.name()));
+				new QuickReply("Create filling", CREATE_FILLING_PAYLOAD.name()),
+				new QuickReply("Delete filling", DELETE_FILLING_PAYLOAD.name()));
 	}
 
 	public void orderingList(Messaging messaging) {
-		messengerClient.sendGenericTemplate(productBucketService.getOrderingList(0), messaging);
+		messengerClient.sendGenericTemplate(productBucketService.getOrderingList(messaging, 0, false), messaging);
 	}
 
 	public void switchMenu(Messaging messaging) {
@@ -94,7 +94,11 @@ public class CurtainPostbackParser {
 
 	public void productActions(Messaging messaging) {
 		messengerClient.sendQuickReplies("Choose actions:", messaging,
-				new QuickReply("Create product", CurtainQuickReplyParser.QuickReplyPayload.CT_PRODUCT_PAYLOAD.name()),
-				new QuickReply("Update product", CurtainQuickReplyParser.QuickReplyPayload.UPDATE_PRODUCT_PAYLOAD.name()));
+				new QuickReply("Create product", CT_PRODUCT_PAYLOAD.name()),
+				new QuickReply("Update product", UPDATE_PRODUCT_PAYLOAD.name()));
+	}
+
+	public void ownOrderingList(Messaging messaging) {
+		messengerClient.sendGenericTemplate(productBucketService.getOrderingList(messaging, 0, true), messaging);
 	}
 }
